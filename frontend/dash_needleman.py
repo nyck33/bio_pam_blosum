@@ -13,6 +13,7 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
 
+from .dash_utils.entrez_layout_components import (upload, upload_output, progress)
 #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 #df = px.data.tips()# Build App
@@ -53,6 +54,7 @@ sidebar = html.Div(
     ],
     style=SIDEBAR_STYLE,
 )
+###########################################################################
 fixed_content = html.Div([
     html.Div(
         "Write intro here", id="intro"
@@ -61,13 +63,14 @@ fixed_content = html.Div([
         html.P("by Fei Xiang and Nobutaka Kim")
     )
 ])
-
+##########################################################################
 needleman_intro = dbc.Container([
     html.H2("Talk about Needleman here and show some stuff", id="title-intro"),
     dbc.Row([
         dbc.Col([
             html.Div(
-                "Some text here",
+                html.P("Objective is to use the two matrices to score\
+                           similarities between 2 protein sequences "),
                 id="needleman-explanation",
             ),
         ], width=4),
@@ -79,21 +82,22 @@ needleman_intro = dbc.Container([
         ])
     ])
 ])
+##############################################################################
 
 entrez_page = dbc.Container([
     html.H1("PAM/BLOSUM protein sequence scorer"),
     html.Div([]),
-    html.P("Objective is to use the following matrices to score\
-           similarities between 2 protein sequences "),
+
 
     dbc.Row([
         dbc.Col([
-            html.H2("Enter Query Sequence"),
+            html.H2("Enter Query Sequence, Upload Fasta File or Enter Accession Number"),
             dbc.FormGroup([
                 dbc.Label("Enter FASTA sequence(s)")
             ])])
     ]
     )])
+#############################################################################
 #todo: make a plots page
 data = open('project/example_fasta_files/human_v_mus.fasta').read()
 plots_page = html.Div([
@@ -107,8 +111,7 @@ plots_page = html.Div([
     html.Div(id='alignment-output')
 ])
 
-
-
+###############################################################################
 content = html.Div([
     html.Div(
         id="fixed-content", style=CONTENT_STYLE
@@ -119,7 +122,8 @@ content = html.Div([
 
 
 app.layout=html.Div([dcc.Location(id="url"), sidebar, content])
-
+##############################################################################
+#callbacks for entire app
 @app.callback(
     [Output('intro-link', "active"),
     Output('parameters-link', "active"),
@@ -151,5 +155,16 @@ def render_page_content(pathname):
     html.P(f'The pathname {pathname} was not recognized...')
 ])
 
+#################################################################################
+#callbacks for entrez_page
+#callbacks for processing file uploadprocessing file upload
+@app.callback(Output('output-data-upload', 'children'),
+              [Input('upload-data', 'contents')],
+              [State('upload-data', 'filename')]
+              )
+def process_file_uploaad(n)
+
+
+#####################################################################################
 if __name__=="__main__":
     app.run_server(debug=True, port=8080)
