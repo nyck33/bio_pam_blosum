@@ -1,5 +1,9 @@
 #import dash_bio
 #print(dash_bio.__version__)
+import base64
+import datetime
+import io
+import pandas as pd
 
 import dash_bio as dashbio
 import six.moves.urllib.request as urlreq
@@ -15,7 +19,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
 
 #import layouts
-from frontend.needleman_layouts.entrez_layout import (upload, upload_output, progress, entrez_page)
+from frontend.needleman_layouts.entrez_layout import (entrez_page)
 from frontend.needleman_layouts.intro_layout import needleman_intro
 from frontend.needleman_layouts.visual_layout import plots_page
 
@@ -85,10 +89,6 @@ content = html.Div([
 app.layout=html.Div([dcc.Location(id="url"), sidebar, content])
 
 ##############################################################
-#register callbacks
-register_entrez_callbacks(app)
-#register_intro_callbacks(app)
-
 ##############################################################################
 #callbacks for entire app
 @app.callback(
@@ -123,9 +123,9 @@ def render_page_content(pathname):
 ])
 
 #################################################################################
-
-
-
+#register callbacks
+register_entrez_callbacks(app)
+#register_intro_callbacks(app)
 #####################################################################################
 if __name__=="__main__":
     app.run_server(debug=True, port=8080)

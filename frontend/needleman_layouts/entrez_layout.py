@@ -18,7 +18,7 @@ from dash_table import DataTable
 #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 
-upload = dbc.Container([
+entrez_page = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.Label(
@@ -31,7 +31,7 @@ upload = dbc.Container([
                 "2.  Upload a fasta format sequence file"
             ),
             dcc.Upload(
-                id='upload-fasta',
+                id='upload-data',
                 children=html.Div([
                     "Drag and Drop or ",
                     html.A('Select Fasta Files')
@@ -54,7 +54,7 @@ upload = dbc.Container([
             dcc.Textarea(
                 id='fasta-text-area',
                 placeholder="type your fasta sequence here",
-                style={'width': '75%%', 'height': 300}
+                style={'width': '90%%', 'height': 300}
             ),
             html.Button(
                 'Submit', id='submit-fasta-text', n_clicks=0
@@ -62,60 +62,54 @@ upload = dbc.Container([
         ], width=6, md=6, sm=12
         ),
         dbc.Col([
-            html.H3(
-                "NCBI Search Results"
-            ),
+            html.H3("NCBI Search Results"),
             DataTable(
                 id="ncbi-search-res-table"
-            )
+            ),
+            html.Br(),
+            html.H3("Check upload contents"),
+            html.Div(#show the uploaded file contents as string
+                id="output-data-upload"
+            ),
         ], width=6, md=6, sm=12)
     ]),
     dbc.Row([
         dbc.Col([
             html.Label(
-                id='Input match score'
+                "Input Match Score",
                     ),
+            html.Br(),
             dcc.Input(
                 id="match-score-input"
-            ),
+            )
+            ],width=4),
+        dbc.Col([
             html.Label(
-                id='Input mismatch score'
+                'Input mismatch score'
             ),
+            html.Br(),
             dcc.Input(
                 id='mismatch-score-input'
             ),
+        ], width=4),
+        dbc.Col([
             html.Label(
-                id='Input gap penalty'
+                'Input gap penalty'
             ),
+            html.Br(),
             dcc.Input(
                 id='gap-penalty-input'
+            ),
+        ], width=4)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Div(#https://dash-bootstrap-components.opensource.faculty.ai/docs/components/progress/
+                id="progress-bar"
             )
         ], width=12)
-
     ])
 ])
 
-#for viewing the uploaded file
-upload_output = html.Div(
-    id="upload-output"
-)
 
-progress = html.Div(
-    [
-        #https://dash-bootstrap-components.opensource.faculty.ai/docs/components/progress/
-    ]
-)
 ######################################################################################
-entrez_page = dbc.Container([
-    html.H1("PAM/BLOSUM protein sequence scorer"),
-    html.Div([]),
-
-
-    dbc.Row([
-        dbc.Col([
-            html.H2("Enter Query Sequence, Upload Fasta File or Enter Accession Number"),
-            dbc.FormGroup([
-                dbc.Label("Enter FASTA sequence(s)")
-            ])])
-    ]
-    )])
