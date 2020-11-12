@@ -68,10 +68,34 @@ upload = dbc.Container([
             DataTable(
                 id="ncbi-search-res-table"
             )
-        ])
+        ], width=6, md=6, sm=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Label(
+                id='Input match score'
+                    ),
+            dcc.Input(
+                id="match-score-input"
+            ),
+            html.Label(
+                id='Input mismatch score'
+            ),
+            dcc.Input(
+                id='mismatch-score-input'
+            ),
+            html.Label(
+                id='Input gap penalty'
+            ),
+            dcc.Input(
+                id='gap-penalty-input'
+            )
+        ], width=12)
+
     ])
 ])
 
+#for viewing the uploaded file
 upload_output = html.Div(
     id="upload-output"
 )
@@ -82,11 +106,16 @@ progress = html.Div(
     ]
 )
 ######################################################################################
-#helpers for functions
-# for uplaod
-def parse_contents(contents, filename, date):
-    content_typpe, content_string, = contents.split(',')
+entrez_page = dbc.Container([
+    html.H1("PAM/BLOSUM protein sequence scorer"),
+    html.Div([]),
 
-    decoded = base64.b64decode(content_string)
-    try:
-        if 'fasta' in filename:
+
+    dbc.Row([
+        dbc.Col([
+            html.H2("Enter Query Sequence, Upload Fasta File or Enter Accession Number"),
+            dbc.FormGroup([
+                dbc.Label("Enter FASTA sequence(s)")
+            ])])
+    ]
+    )])

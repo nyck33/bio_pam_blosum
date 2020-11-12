@@ -1,5 +1,5 @@
-import dash_bio
-print(dash_bio.__version__)
+#import dash_bio
+#print(dash_bio.__version__)
 
 import dash_bio as dashbio
 import six.moves.urllib.request as urlreq
@@ -8,17 +8,25 @@ import dash_html_components as html
 import plotly.express as px
 import dash
 from dash import Dash
+from dash_table import DataTable
 #from jupyter_dash import JupyterDash
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
 
-from .dash_utils.entrez_layout_components import (upload, upload_output, progress)
-#external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+#import layouts
+from frontend.needleman_layouts.entrez_layout import (upload, upload_output, progress, entrez_page)
+from frontend.needleman_layouts.intro_layout import needleman_intro
+from frontend.needleman_layouts.visual_layout import plots_page
+
+#import register_callbacks
+from frontend.needleman_callbacks.entrez_callbacks import register_entrez_callbacks
+
+#register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
-#df = px.data.tips()# Build App
 app = Dash(external_stylesheets=external_stylesheets)
 
+###############################################################
 SIDEBAR_STYLE={
     "position": "fixed",
     "top": 0,
@@ -34,7 +42,8 @@ CONTENT_STYLE = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
 }
-
+###############################################################
+#layout components on every page
 sidebar = html.Div(
     [
         html.H3("PAM BLOSUM + NCBI API", className='display-4'),
@@ -54,7 +63,7 @@ sidebar = html.Div(
     ],
     style=SIDEBAR_STYLE,
 )
-###########################################################################
+##############################################################
 fixed_content = html.Div([
     html.Div(
         "Write intro here", id="intro"
@@ -63,55 +72,9 @@ fixed_content = html.Div([
         html.P("by Fei Xiang and Nobutaka Kim")
     )
 ])
-##########################################################################
-needleman_intro = dbc.Container([
-    html.H2("Talk about Needleman here and show some stuff", id="title-intro"),
-    dbc.Row([
-        dbc.Col([
-            html.Div(
-                html.P("Objective is to use the two matrices to score\
-                           similarities between 2 protein sequences "),
-                id="needleman-explanation",
-            ),
-        ], width=4),
-        dbc.Col([
-            html.Div(
-                "Diagrams here",
-                id="needleman-diagrams"
-            )
-        ])
-    ])
-])
-##############################################################################
-
-entrez_page = dbc.Container([
-    html.H1("PAM/BLOSUM protein sequence scorer"),
-    html.Div([]),
 
 
-    dbc.Row([
-        dbc.Col([
-            html.H2("Enter Query Sequence, Upload Fasta File or Enter Accession Number"),
-            dbc.FormGroup([
-                dbc.Label("Enter FASTA sequence(s)")
-            ])])
-    ]
-    )])
-#############################################################################
-#todo: make a plots page
-data = open('project/example_fasta_files/human_v_mus.fasta').read()
-plots_page = html.Div([
-    dashbio.AlignmentChart(
-        id='testchart',
-        data=data,
-        colorscale='hydro',
-        conservationcolorscale='blackbody',
-        tilewidth=50
-    ),
-    html.Div(id='alignment-output')
-])
 
-###############################################################################
 content = html.Div([
     html.Div(
         id="fixed-content", style=CONTENT_STYLE
@@ -119,9 +82,13 @@ content = html.Div([
     html.Div(id="page-content", style=CONTENT_STYLE)
 ])
 
-
-
 app.layout=html.Div([dcc.Location(id="url"), sidebar, content])
+
+##############################################################
+#register callbacks
+register_entrez_callbacks(app)
+#register_intro_callbacks(app)
+
 ##############################################################################
 #callbacks for entire app
 @app.callback(
@@ -156,13 +123,7 @@ def render_page_content(pathname):
 ])
 
 #################################################################################
-#callbacks for entrez_page
-#callbacks for processing file uploadprocessing file upload
-@app.callback(Output('output-data-upload', 'children'),
-              [Input('upload-data', 'contents')],
-              [State('upload-data', 'filename')]
-              )
-def process_file_uploaad(n)
+
 
 
 #####################################################################################
