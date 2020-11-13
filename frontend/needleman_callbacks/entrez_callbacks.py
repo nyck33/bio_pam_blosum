@@ -45,6 +45,10 @@ def register_entrez_callbacks(app):
         print(f'string:{type(content_string)}\n{content_string}\n')
         decoded = base64.b64decode(content_string)
         print(f'decoded:{decoded}\n')
+        #seq1 = SeqIO.read(decoded, "fasta")
+        seq_str = str(decoded)
+        print(f'seq_str: {seq_str}')
+        '''
         try:
             
             seq = SeqIO.read(decoded, "fasta")
@@ -54,13 +58,13 @@ def register_entrez_callbacks(app):
             return html.Div([
                 'Error processing file upload'
             ])
-
+        '''
         return html.Div([
             html.H5(filename),
             html.H6(datetime.datetime.fromtimestamp(date)),
 
             html.Div(
-                f'{decoded}'
+                f'{seq_str}'
             ),
             html.Hr(),
 
