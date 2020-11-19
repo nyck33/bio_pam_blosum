@@ -25,7 +25,15 @@ matrix_names_arr = ['PAM 30', 'PAM 70', 'PAM 250',
 
 entrez_page = dbc.Container([
     dcc.Store(id="sequence-1-store"),
+    html.Div(
+        "check store 1",
+        id="check-store-1"
+    ),
     dcc.Store(id="sequence-2-store"),
+    html.Div(
+        "check store 2",
+        id="check-store-2"
+    ),
     dcc.Store(id="entrez-class-store"),
     dbc.Row([
         dbc.Col([
@@ -40,24 +48,39 @@ entrez_page = dbc.Container([
                 size="50"
             ),
             html.Br(),
+            dbc.Button(
+                'Search 1',
+                id='btn-acc-1',
+                color="primary",
+                n_clicks=0
+            ),
+            html.Br(),
             html.Label("Accession 2:"),
             dcc.Input(
                 id="accession-input-two",
                 type="text",
                 size="50"
             ),
-            #todo: put results here
+            dbc.Button(
+                'Search 1',
+                id='btn-acc-2',
+                color="primary",
+                n_clicks=0
+            )
+
         ], width=12),
     ]),
-    dbc.Row([
+    dbc.Row([ # results of accession search
         dbc.Col([
             html.P(
-                "fasta res 1 here", id='accession-fasta-1',
+                "fasta res 1 here",
+                id='accession-fasta-1',
             ),
         ], width=6),
         dbc.Col([
             html.P(
-                "fasta res 2 here", id='accession-fasta-2'
+                "fasta res 2 here",
+                id='accession-fasta-2'
             )
         ], width=6)
     ]),
@@ -84,7 +107,8 @@ entrez_page = dbc.Container([
             ),
             html.Br(),
             html.P(
-                "query translation output", id="query-translation-output"
+                "query translation output",
+                id="query-translation-output"
             ),
         ], width=12)
     ]),
@@ -120,7 +144,7 @@ entrez_page = dbc.Container([
                     'testAlign': 'center',
                     'margin': '10px'
                 },
-                multiple=True
+                multiple=False
             ),
         ], width=6),
         dbc.Col([
@@ -141,7 +165,7 @@ entrez_page = dbc.Container([
                     'testAlign': 'center',
                     'margin': '10px'
                 },
-                multiple=True
+                multiple=False
             ),
         ], width=6)
     ]),
@@ -194,9 +218,9 @@ entrez_page = dbc.Container([
                 min=1,
                 max=10,
                 step=1,
-                value=5
+                value=5,
             ),
-            html.Div("match-slider-val")
+            html.Div(id="match-slider-val")
         ], width=4),
         dbc.Col([
             html.Label('mismatch score, default=5'),
@@ -206,9 +230,9 @@ entrez_page = dbc.Container([
                 min=-10,
                 max=-1,
                 step=1,
-                value=-5
+                value=-5,
             ),
-            html.Div("mismatch-slider-val")
+            html.Div(id="mismatch-slider-val")
         ], width=4),
         dbc.Col([
             html.Label('gap penalty, default=-5'),
@@ -218,9 +242,9 @@ entrez_page = dbc.Container([
                 min=-10,
                 max=-1,
                 step=1,
-                value=-5
+                value=-5,
             ),
-            html.Div("gap-penalty-slider-val")
+            html.Div(id="gap-penalty-slider-val"),
         ], width=4)
     ]),
     dbc.Row([
@@ -236,7 +260,10 @@ entrez_page = dbc.Container([
         dbc.Col([
             html.Br(),
             dbc.Button(
-                'Run Needleman Wunsch', id='submit-fastas', n_clicks=0
+                'Run Needleman Wunsch',
+                id='submit-fastas',
+                color="success",
+                n_clicks=0
             )
         ], width=4)
     ]),

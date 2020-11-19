@@ -87,7 +87,8 @@ def trace_back(seq1, seq2, matrix, gap, S, current_x, current_y, S1, S2, t1, t2)
         trace_back(seq1, seq2, matrix, gap, S, current_x-1, current_y-1, S1, S2, seq1[current_x] + t1[:], seq2[current_y] + t2[:])
 
 
-def main():
+def main(seq1, seq2, match_score, mismatch_score, gap_penalty):
+	'''
 	mode='PAM30'
 	file_name = parse_name(mode)
 	matrix = load(file_name)
@@ -100,6 +101,13 @@ def main():
 	print(S1)
 	print(S2)
 	print(F)
-
+	'''
 if __name__ == '__main__':
-	main()
+	seq1 = "ATGGC"
+	seq2 = "ACTG"
+
+	match_score = 5
+	mismatch_score = -5
+	gap_penalty = -5
+	matrix = "BLOSUM 62"
+	main(seq1, seq2, match_score, mismatch_score, gap_penalty, matrix)

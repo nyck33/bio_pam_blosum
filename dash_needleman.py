@@ -4,6 +4,7 @@ import base64
 import datetime
 import io
 import pandas as pd
+import json
 
 import dash_bio as dashbio
 import six.moves.urllib.request as urlreq
@@ -19,7 +20,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State  # Load Data
 
 #import layouts
-from frontend.needleman_layouts.entrez_layout import (entrez_page)
+from frontend.needleman_layouts.entrez_layout import entrez_page #, register_entrez_callbacks
 from frontend.needleman_layouts.intro_layout import needleman_intro
 from frontend.needleman_layouts.visual_layout import plots_page
 
@@ -47,6 +48,11 @@ external_stylesheets = [dbc.themes.BOOTSTRAP]
 app = Dash(external_stylesheets=external_stylesheets)
 app.title = "Needleman Wunsch and NCBI"
 #app.config['suppress_callback_exceptions'] = True
+
+#######################################################################
+#register callbacks
+register_entrez_callbacks(app)
+#register_intro_callbacks(app)
 
 ###############################################################
 SIDEBAR_STYLE={
@@ -86,23 +92,8 @@ sidebar = html.Div(
     style=SIDEBAR_STYLE,
 )
 ##############################################################
-fixed_content = html.Div([
-    html.Div(
-        "Write intro here", id="intro"
-    ),
-    html.Div(
-        html.P("by Fei Xiang and Nobutaka Kim")
-    )
-])
-
-
-
-content = html.Div([
-    html.Div(
-        id="fixed-content", style=CONTENT_STYLE
-    ),
-    html.Div(id="page-content", style=CONTENT_STYLE)
-])
+# todo: no fixed content
+content = html.Div(id="page-content", style=CONTENT_STYLE)
 
 app.layout=html.Div([dcc.Location(id="url"), sidebar, content])
 
@@ -124,17 +115,16 @@ def toggle_active_links(pathname):
     else:  #todo: need error pages when url pathname entry is not a match
         return False, False, True
 
-@app.callback([Output("fixed-content", "children"),
-               Output("page-content", "children")],
+@app.callback(Output("page-content", "children"),
               [Input("url", "pathname")])
 def render_page_content(pathname):
     if pathname in ["/", "/project-intro"]:
-        return fixed_content, needleman_intro
+        return needleman_intro
     elif pathname == "/entrez-parameters":
-        return fixed_content, entrez_page
+        return entrez_page
     elif pathname == "/plots":
-        return fixed_content, plots_page
-    return fixed_content, dbc.Jumbotron([
+        return plots_page
+    return dbc.Jumbotron([
     html.H1("404: Not found", className='text-danger'),
     html.Hr(),
     html.P(f'The pathname {pathname} was not recognized...')
@@ -142,8 +132,13 @@ def render_page_content(pathname):
 
 #################################################################################
 #register callbacks
-register_entrez_callbacks(app)
+#register_entrez_callbacks(app)
 #register_intro_callbacks(app)
+#####################################################################################
+#entrez callbacks
+
+
+
 #####################################################################################
 if __name__=="__main__":
     app.run_server(debug=True, port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
