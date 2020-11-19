@@ -102,6 +102,7 @@ def main(seq1, seq2, match_score, mismatch_score, gap_penalty):
 	print(S2)
 	print(F)
 	'''
+    #return S1, S2, F
 if __name__ == '__main__':
 	seq1 = "ATGGC"
 	seq2 = "ACTG"
@@ -110,4 +111,4 @@ if __name__ == '__main__':
 	mismatch_score = -5
 	gap_penalty = -5
 	matrix = "BLOSUM 62"
-	main(seq1, seq2, match_score, mismatch_score, gap_penalty, matrix)
+	S1, S2, F = main(seq1, seq2, match_score, mismatch_score, gap_penalty, matrix)
