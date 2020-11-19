@@ -24,30 +24,51 @@ matrix_names_arr = ['PAM 30', 'PAM 70', 'PAM 250',
                      'BLOSUM 45', 'BLOSUM 50', 'BLOSUM 90']
 
 entrez_page = dbc.Container([
+    dcc.Store(id="sequence-1-store"),
+    dcc.Store(id="sequence-2-store"),
+    dcc.Store(id="entrez-class-store"),
     dbc.Row([
         dbc.Col([
-            html.Label(
+            html.H3(
                 "1.  To access a sequence from NCBI using accession number, enter it here"
             ),
+            html.Br(),
+            html.Label("Accession 1:"),
             dcc.Input(
                 id="accession-input",
                 type="text",
                 size="50"
             ),
             html.Br(),
-            html.Label(
-                "Enter accession number for second sequence here"
-            ),
+            html.Label("Accession 2:"),
             dcc.Input(
                 id="accession-input-two",
                 type="text",
                 size="50"
             ),
-            html.Br(),
-            html.Label(
-                "Search by term (including booleans), click on the link for boolean rules."
+            #todo: put results here
+        ], width=12),
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.P(
+                "fasta res 1 here", id='accession-fasta-1',
+            ),
+        ], width=6),
+        dbc.Col([
+            html.P(
+                "fasta res 2 here", id='accession-fasta-2'
+            )
+        ], width=6)
+    ]),
+    html.Hr(),
+    dbc.Row([
+        dbc.Col([
+            html.H3(
+                "2. Search by term (including booleans)"
             ),
             html.Br(),
+            html.Label("click on the link for boolean rules."),
             html.A("NCBI boolean rules",
                 href="https://www.ncbi.nlm.nih.gov/Class/MLACourse/Modules/Entrez/complex_boolean.html",
                 target="_blank"
@@ -62,16 +83,27 @@ entrez_page = dbc.Container([
                 size="100"
             ),
             html.Br(),
-            html.Hr(),
-            html.Label("NCBI Search Results appear here"),
-            html.H3("NCBI Search Results"),
-            DataTable(
-                id="ncbi-search-res-table"
+            html.P(
+                "query translation output", id="query-translation-output"
             ),
-            html.Br(),
-            html.Label(
-                "2.  Upload a single or multi-fasta file"
+        ], width=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Label("Accession Search Results appear here"),
+            html.Div(
+                # full fasta for accession num input
+                id="accession-search-res"
             ),
+        ], width=12)
+    ]),
+    html.Hr(),
+    dbc.Row([
+        dbc.Col([
+            html.H3("3. Upload 2 fasta files or a multi-fasta file of 2 sequences")
+        ], width=12),
+        dbc.Col([
+            html.Label("fasta file 1"),
             dcc.Upload(
                 id='upload-data',
                 children=html.Div([
@@ -79,9 +111,9 @@ entrez_page = dbc.Container([
                     html.A('Select Fasta Files')
                 ]),
                 style={
-                    'width': '100%',
-                    'height': '60px',
-                    'lineHeight':'60px',
+                    'width': '70%',
+                    'height': '100px',
+                    'lineHeight': '60px',
                     'borderWidth': '1px',
                     'borderStyle': 'dashed',
                     'borderRadius': '5px',
@@ -90,10 +122,9 @@ entrez_page = dbc.Container([
                 },
                 multiple=True
             ),
-            html.Br(),
-            html.Label(
-                "Upload a second fasta file (if not multi)"
-            ),
+        ], width=6),
+        dbc.Col([
+            html.Label("fasta file 2"),
             dcc.Upload(
                 id='upload-data-two',
                 children=html.Div([
@@ -101,9 +132,9 @@ entrez_page = dbc.Container([
                     html.A('Select Fasta Files')
                 ]),
                 style={
-                    'width': '100%',
-                    'height': '60px',
-                    'lineHeight':'60px',
+                    'width': '70%',
+                    'height': '100px',
+                    'lineHeight': '60px',
                     'borderWidth': '1px',
                     'borderStyle': 'dashed',
                     'borderRadius': '5px',
@@ -112,85 +143,125 @@ entrez_page = dbc.Container([
                 },
                 multiple=True
             ),
-            html.Br(),
-            html.H3("Check upload contents sequence 1"),
-            html.Div(#show the uploaded file contents as string
+        ], width=6)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.P("Check upload contents sequence 1"),
+            html.Div(  # show the uploaded file contents as string
                 id="output-data-upload"
             ),
-            html.Br(),
-            html.H3("Check upload contents (if) sequence 2"),
-            html.Div(#show the uploaded file contents as string
+        ], width=12),
+        dbc.Col([
+            html.P("Check upload contents (if) sequence 2"),
+            html.Div(  # show the uploaded file contents as string
                 id="output-data-upload-two"
             ),
-            html.Br(),
-            html.Label(
-                    "3.  Or copy and paste or type sequence 1 here"
-            ),
+        ], width=12)
+    ]),
+    html.Hr(),
+    dbc.Row([
+        dbc.Col([
+            html.H3("3. Manual Input of Sequences"),
+        ], width=12),
+        dbc.Col([
+            html.Label("sequence 1"),
             html.Br(),
             dcc.Textarea(
                 id='fasta-text-area',
                 placeholder="type your fasta sequence here",
                 style={'width': '100%', 'height': 300}
             ),
-            html.Br(),
-            html.Label(
-                    "3.  Or copy and paste or type sequence 2 here"
-            ),
+        ], width=6),
+        dbc.Col([
+            html.Label("sequence 2"),
             html.Br(),
             dcc.Textarea(
                 id='fasta-text-area-two',
                 placeholder="type your fasta sequence here",
                 style={'width': '100%', 'height': 300}
             ),
-            html.Br(),
-
-        ], width=12, md=12, sm=12
-        ), #end col
+        ], width=6)
     ]),
     html.Hr(),
+    #Let’s say match is 1-10 mismatch is -1 to -10. Gap penalty is -1 to -10 as well
     dbc.Row([
         dbc.Col([
-            html.Label("Input Match Score"),
+            html.Label("match score, default=5"),
             html.Br(),
-            dcc.Input(
-                id="match-score-input"
-            )
-            ],width=4),
-        dbc.Col([
-            html.Label('Input mismatch score'),
-            html.Br(),
-            dcc.Input(
-                id='mismatch-score-input'
+            dcc.Slider(
+                id="match-slider",
+                min=1,
+                max=10,
+                step=1,
+                value=5
             ),
+            html.Div("match-slider-val")
         ], width=4),
         dbc.Col([
-            html.Label('Input gap penalty, default=10'),
+            html.Label('mismatch score, default=5'),
             html.Br(),
-            dcc.Input(
-                id='gap-penalty-input'
+            dcc.Slider(
+                id='mismatch-slider',
+                min=-10,
+                max=-1,
+                step=1,
+                value=-5
             ),
+            html.Div("mismatch-slider-val")
+        ], width=4),
+        dbc.Col([
+            html.Label('gap penalty, default=-5'),
+            html.Br(),
+            dcc.Slider(
+                id='gap-penalty-slider',
+                min=-10,
+                max=-1,
+                step=1,
+                value=-5
+            ),
+            html.Div("gap-penalty-slider-val")
         ], width=4)
     ]),
     dbc.Row([
         dbc.Col([
+            html.Label("Select Matrix"),
             dcc.Dropdown(
                 id='matrix-dropdown',
                 options = [{'label': matrix, 'value': matrix} for matrix in matrix_names_arr
                             ],
                 value="BLOSUM 62"
             )
-        ],width=12),
+        ], width=4),
         dbc.Col([
             html.Br(),
             dbc.Button(
-                'Submit', id='submit-fasta', n_clicks=0
+                'Run Needleman Wunsch', id='submit-fastas', n_clicks=0
             )
-        ], width=12)
+        ], width=4)
     ]),
     dbc.Row([
         dbc.Col([
             html.Div(#https://dash-bootstrap-components.opensource.faculty.ai/docs/components/progress/
                 id="progress-bar"
+            )
+        ], width=12)
+    ]),
+    html.Hr(),
+    dbc.Row([
+        dbc.Col([
+            html.H3("Needleman Results")
+        ], width=12),
+        dbc.Col([
+            html.H3("Score"),
+            html.P(
+                id="score"
+            )
+        ], width=12),
+        dbc.Col([
+            html.H3("Alignments"),
+            html.P(
+                id="alignments"
             )
         ], width=12)
     ])

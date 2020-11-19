@@ -11,12 +11,12 @@ from six import PY3
 import dash_html_components as html
 import plotly.express as px
 import dash
-from dash import Dash
+from dash import Dash, exceptions, no_update, callback_context
 from dash_table import DataTable
 #from jupyter_dash import JupyterDash
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output, State # Load Data
+from dash.dependencies import Input, Output, State  # Load Data
 
 #import layouts
 from frontend.needleman_layouts.entrez_layout import (entrez_page)
@@ -26,9 +26,27 @@ from frontend.needleman_layouts.visual_layout import plots_page
 #import register_callbacks
 from frontend.needleman_callbacks.entrez_callbacks import register_entrez_callbacks
 
+#import ncbi search class
+from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
+from Bio import Entrez
+from Bio import SeqIO
+# Entrez connection
+Entrez.email = "nobutaka@gatech.edu"
+# tool defaults to BioPython
+#Entrez.tool = "getProteinFastas" #homologs later
+db = 'protein'
+#todo: learn to use this and adjust retmax
+#paramEutils = {'usehistory': 'Y'}
+handle = Entrez.einfo(db='protein')
+# record is a dictionary record['DbInfo']['FieldList] shows
+#record= Entrez.read(handle)
+# see all available db's
+
 #register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 app = Dash(external_stylesheets=external_stylesheets)
+app.title = "Needleman Wunsch and NCBI"
+#app.config['suppress_callback_exceptions'] = True
 
 ###############################################################
 SIDEBAR_STYLE={
@@ -128,4 +146,4 @@ register_entrez_callbacks(app)
 #register_intro_callbacks(app)
 #####################################################################################
 if __name__=="__main__":
-    app.run_server(debug=True, port=8080)
+    app.run_server(debug=True, port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)

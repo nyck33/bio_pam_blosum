@@ -2,6 +2,7 @@ import base64
 import datetime
 import io
 import pandas as pd
+import json
 
 import dash_bio as dashbio
 import six.moves.urllib.request as urlreq
@@ -9,7 +10,7 @@ from six import PY3
 import dash_html_components as html
 import plotly.express as px
 import dash
-from dash import Dash
+from dash import Dash, no_update, exceptions, callback_context
 from dash_table import DataTable
 #from jupyter_dash import JupyterDash
 import dash_core_components as dcc
@@ -19,13 +20,42 @@ from Bio import SeqIO
 
 
 def register_entrez_callbacks(app):
+    @app.callback(Output('match-slider-val', 'children'),
+                [Input('match-slider', 'value')])
+    def show_slider_vals(value):
+        return f'match score: {value}'
+
+    @app.callback(Output('mismatch-slider-val', 'children'),
+                  [Input('mismatch-slider', 'value')])
+    def show_mismatch_slider_val(value):
+        return f'mismatch score: {value}'
+
+    @app.callback(Output('gap-penalty-slider-val', 'children'),
+                  [Input('gap-penalty-slider', 'value')])
+    def show_gap_pen_slider_val(value):
+        return f'gap penalty: {value}'
+
+    @app.callback([Output('score', 'children'),
+                   Output('alignments', 'children')],
+                  [Input('submit-fastas', 'n_clicks')],
+                  [State('sequence-1-store', 'data'),
+                  State('sequence-2-store', 'data')])
+
+    def run_needleman(run_btn, seq1_json, seq2_json):
+        pass
+
+
+
     # callbacks for entrez_page
-    # callbacks for processing file uploadprocessing file upload
-    @app.callback(Output('output-data-upload', 'children'),
+    # callbacks for processing file upload processing file upload
+    @app.callback([Output('sequence-1-store', 'data'),
+                   Output('output-data-upload', 'children')],
                   [Input('upload-data', 'contents')],
                   [State('upload-data', 'filename'),
                    State('upload-data', 'last_modified')])
     def process_upload(list_of_contents, list_of_names, list_of_dates):
+        if not list_of_contents and not list_of_names and not list_of_dates:
+            return no_update
         print(f"listContents: {type(list_of_contents)}\n{list_of_contents[0]}")
 
         for i in range(len(list_of_contents)):
@@ -47,50 +77,37 @@ def register_entrez_callbacks(app):
         print(f'name:{type(filename)}\n{filename}\n')
         print(f'type:{type(content_type)}\n{content_type}\n')
         print(f'string:{type(content_string)}\n{content_string}\n')
-        #source = binascii.b2a_base64(content_string)
         decoded = decode_file_content(content_string)
-        #utf8_decoded = content_string.decode('utf-8').replace('\n', '');
-        #print(f'utf8: {utf8_decoded}')
-        print(f'decoded:{decoded}\n')
-        #seq1 = SeqIO.parse(decoded, "fasta")
-        #print(f'seq parsed {seq1}')
-        #seq_str = str(decoded)
-        #print(f'seq_str: {seq_str}')
-        #split into lines for output as P's
-        #seq_arr = seq_str.split('\n')
-        #replace \n
-        #seq_arr = [x.replace("\n", " ") for x in seq_arr]
-        #print('seq_arr')
-        #for line in seq_arr:
-         #   print(line)
-        '''
-        try:
-            
-            seq = SeqIO.read(decoded, "fasta")
-            print(f'\n\nseq:{seq}')
-        except Exception as e:
-            print(e)
-            return html.Div([
-                'Error processing file upload'
-            ])
-        '''
-        return html.Div([
-            html.H5(filename),
-            html.H6(datetime.datetime.fromtimestamp(date)),
+        print(f'decoded:\n{decoded}\n')
+        #get substring from line 2
+        decoded_arr = decoded.split()
+        seq=""
+        for line in decoded_arr:
+            if len(line) >10 and line.upper() == line and line.isalpha():
+                seq+=line
 
-            html.Div([
-                html.P(decoded)
-            ]),
-            html.Hr(),
+        assert seq.isalpha()
+        print(seq)
+        print(len(seq))
 
-            #debugging content
-            html.Div('Raw Content'),
-            html.Pre(contents[0:100] + '...', style={
-                'whiteSpace': 'pre-wrap',
-                'wordBreak': 'break-all'
-            })
+        return json.dumps(seq),\
+                    html.Div([
+                    html.H5(filename),
+                    html.H6(datetime.datetime.fromtimestamp(date)),
 
-        ])
+                    html.Div([
+                        html.P(decoded)
+                    ]),
+                    html.Hr(),
+
+                    #debugging content
+                    html.Div('Raw Content'),
+                    html.Pre(contents[:] + '...', style={
+                        'whiteSpace': 'pre-wrap',
+                        'wordBreak': 'break-all'
+                    })
+
+                ])
 
     # annotations (param: param type) -> return type
     def decode_file_content(file: str) -> str:
@@ -103,3 +120,4 @@ def register_entrez_callbacks(app):
         results: decoded str
         """
         return base64.b64decode(file.split(',')[-1].encode('ascii')).decode()
+
