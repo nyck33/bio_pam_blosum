@@ -27,6 +27,9 @@ def register_entrez_callbacks(app):
                    State('upload-data', 'last_modified')])
     def process_upload(list_of_contents, list_of_names, list_of_dates):
         print(f"listContents: {type(list_of_contents)}\n{list_of_contents[0]}")
+
+        for i in range(len(list_of_contents)):
+            print(i, type(list_of_contents[i]), list_of_contents[i])
         print(f"listFilename: {type(list_of_names)}\n{list_of_names[0]}")
         print(f"listModified: {type(list_of_dates)}\n{list_of_dates[0]}")
         if list_of_contents is not None:
@@ -39,15 +42,27 @@ def register_entrez_callbacks(app):
     # helpers for functions
     # for uplaod
     def parse_contents(contents, filename, date):
+        contents = contents.replace('\n', '')
         content_type, content_string, = contents.split(',')
         print(f'name:{type(filename)}\n{filename}\n')
         print(f'type:{type(content_type)}\n{content_type}\n')
         print(f'string:{type(content_string)}\n{content_string}\n')
-        decoded = base64.b64decode(content_string)
+        #source = binascii.b2a_base64(content_string)
+        decoded = decode_file_content(content_string)
+        #utf8_decoded = content_string.decode('utf-8').replace('\n', '');
+        #print(f'utf8: {utf8_decoded}')
         print(f'decoded:{decoded}\n')
-        #seq1 = SeqIO.read(decoded, "fasta")
-        seq_str = str(decoded)
-        print(f'seq_str: {seq_str}')
+        #seq1 = SeqIO.parse(decoded, "fasta")
+        #print(f'seq parsed {seq1}')
+        #seq_str = str(decoded)
+        #print(f'seq_str: {seq_str}')
+        #split into lines for output as P's
+        #seq_arr = seq_str.split('\n')
+        #replace \n
+        #seq_arr = [x.replace("\n", " ") for x in seq_arr]
+        #print('seq_arr')
+        #for line in seq_arr:
+         #   print(line)
         '''
         try:
             
@@ -63,9 +78,9 @@ def register_entrez_callbacks(app):
             html.H5(filename),
             html.H6(datetime.datetime.fromtimestamp(date)),
 
-            html.Div(
-                f'{seq_str}'
-            ),
+            html.Div([
+                html.P(decoded)
+            ]),
             html.Hr(),
 
             #debugging content
@@ -77,3 +92,14 @@ def register_entrez_callbacks(app):
 
         ])
 
+    # annotations (param: param type) -> return type
+    def decode_file_content(file: str) -> str:
+        """
+        Decode file from base64 to ascii
+        Parameters
+        :param file: str, required
+        A base64 string
+        :return:
+        results: decoded str
+        """
+        return base64.b64decode(file.split(',')[-1].encode('ascii')).decode()
