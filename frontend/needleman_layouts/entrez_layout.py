@@ -24,17 +24,32 @@ matrix_names_arr = ['PAM 30', 'PAM 70', 'PAM 250',
                      'BLOSUM 45', 'BLOSUM 50', 'BLOSUM 90']
 
 entrez_page = dbc.Container([
-    dcc.Store(id="sequence-1-store"),
-    html.Div(
-        "check store 1",
-        id="check-store-1"
-    ),
-    dcc.Store(id="sequence-2-store"),
-    html.Div(
-        "check store 2",
-        id="check-store-2"
-    ),
-    dcc.Store(id="entrez-class-store"),
+    #########################################################################
+    # debug and store
+    dbc.Row([
+        dbc.Col([
+            dcc.Store(id="sequence-1-store"),
+            html.Div(
+                "check store 1",
+                id="check-store-1"
+            ),
+            dcc.Store(id="sequence-2-store"),
+            html.Div(
+                "check store 2",
+                id="check-store-2"
+            ),
+            html.Pre(
+                "context checker",
+                id='ctx-check'
+            ),
+            html.Div(
+                "other debug output",
+                id='debug-out'
+            )
+        ], width=12)
+    ]),
+    #######################################################################
+    #accession input
     dbc.Row([
         dbc.Col([
             html.H3(
@@ -85,6 +100,8 @@ entrez_page = dbc.Container([
         ], width=6)
     ]),
     html.Hr(),
+    ################################################################
+    #NCBI search area
     dbc.Row([
         dbc.Col([
             html.H3(
@@ -104,6 +121,12 @@ entrez_page = dbc.Container([
                 id="term-search-input",
                 type="text",
                 size="100"
+            ),
+            dbc.Button(
+                'Find Accession Numbers',
+                id='btn-search-ncbi',
+                color="primary",
+                n_clicks=0
             ),
             html.Br(),
             html.P(
@@ -196,6 +219,13 @@ entrez_page = dbc.Container([
                 placeholder="type your fasta sequence here",
                 style={'width': '100%', 'height': 300}
             ),
+            html.Br(),
+            dbc.Button(
+                'Confirm sequence 1',
+                id='btn-text-1',
+                color="primary",
+                n_clicks=0
+            )
         ], width=6),
         dbc.Col([
             html.Label("sequence 2"),
@@ -205,6 +235,13 @@ entrez_page = dbc.Container([
                 placeholder="type your fasta sequence here",
                 style={'width': '100%', 'height': 300}
             ),
+            html.Br(),
+            dbc.Button(
+                'Confirm sequence 2',
+                id='btn-text-2',
+                color="primary",
+                n_clicks=0
+            )
         ], width=6)
     ]),
     html.Hr(),

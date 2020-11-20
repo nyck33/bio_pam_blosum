@@ -13,10 +13,11 @@ def compare(a, b, matrix, gap):
 
 
 def parse_name(mode):
-	file_prefix='./sub_matrix/'
-	if mode is 'PAM30':
-		file_name = file_prefix+'PAM30'
-	return file_name
+	file_prefix ='./sub_matrix/'
+	#if mode =='PAM30':
+	#	file_name = file_prefix+'PAM30'
+
+	return file_prefix + mode
 
 
 def load(file_name):

@@ -43,6 +43,9 @@ handle = Entrez.einfo(db='protein')
 #record= Entrez.read(handle)
 # see all available db's
 
+#todo: backend import
+from backend.pam import main, trace_back, build_matrics, load, parse_name, compare
+
 #register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 app = Dash(external_stylesheets=external_stylesheets)
