@@ -93,7 +93,7 @@ def register_entrez_callbacks(app):
     def update_store(btn_acc, btn_acc2, upload_contents, upload_contents2,
                      btn_txt, btn_txt2, acc_input, acc_input2, upload_name, upload_date,
                      upload_name2, upload_date2, txt_input1, txt_input2):
-        if btn_acc<=0 and btn_acc2<=0 and (upload_contents is None or upload_contents2 is None)\
+        if btn_acc<=0 and btn_acc2<=0 and upload_contents is None and upload_contents2 is None\
                 and btn_txt<=0 and btn_txt2<=0:
             return no_update, no_update, no_update, no_update
 
@@ -247,8 +247,8 @@ def register_entrez_callbacks(app):
 # run needle callbacks
     #might need:
     #State('match-slider', 'value') State('mismatch-slider', 'value)
-    @app.callback([Output('score', 'children'),
-                   Output('alignments', 'children')],
+    @app.callback([Output('matrix-output', 'children'),
+                   Output('alignments-output', 'children')],
                   [Input('submit-fastas', 'n_clicks')],
                   [State('sequence-1-store', 'data'),
                    State('sequence-2-store', 'data'),
@@ -261,10 +261,18 @@ def register_entrez_callbacks(app):
         seq1 = json.loads(seq1_json)
         seq2 = json.loads(seq2_json)
 
-        S1, S2, F = main(seq1, seq2, gap, matrix)
+        S1, S2, M = main(seq1, seq2, matrix, gap)
 
+        align_dict = dict(zip(S1, S2))
 
+        alignments_Pre = html.Pre(S1, S2, align_dict,
+                             style={
+                                 'whiteSpace': 'pre-wrap',
+                                 'wordBreak': 'break-all'
+                             }
+                            )
 
+        return M, alignments_Pre
 '''
 # run needle engine and output as check
         # todo: call main(param)

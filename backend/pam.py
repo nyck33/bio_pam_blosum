@@ -1,38 +1,37 @@
 #!/usr/bin/env python3
 
 import numpy as np
-
+import os
 
 def compare(a, b, matrix, gap):
-	if " " == a or b == " ":
-		return gap
-	else:
-		index_a = matrix[0].index(a)
-		index_b = matrix[0].index(b)
-		return int(matrix[index_a+1][index_b+1])
+    if " " == a or b == " ":
+        return gap
+    else:
+        index_a = matrix[0].index(a)
+        index_b = matrix[0].index(b)
+    return int(matrix[index_a+1][index_b+1])
 
 
 def parse_name(mode):
-	file_prefix ='./sub_matrix/'
-	#if mode =='PAM30':
-	#	file_name = file_prefix+'PAM30'
+    script_dir = os.path.dirname(__file__)
+    rel_path ='sub_matrix/'
+    matrix_file_path = rel_path + mode
+    abs_file_path = os.path.join(script_dir, matrix_file_path)
 
-	return file_prefix + mode
+    return abs_file_path
 
 
 def load(file_name):
-	matrix = []
+    matrix = []
+    f = open(file_name, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        if "#" not in line:
+            line=line.strip("\n")
+            matrix.append(line.split())
 
-	f = open(file_name, 'r')
-	lines = f.readlines()
-	f.close()
-	for line in lines:
-		if "#" not in line:
-			line=line.strip("\n")
-			matrix.append(line.split())
-
-	return matrix
-
+    return matrix
 
 
 #currently the matrix is looking for minimum number, thus the scoreig
@@ -88,27 +87,27 @@ def trace_back(seq1, seq2, matrix, gap, S, current_x, current_y, S1, S2, t1, t2)
         trace_back(seq1, seq2, matrix, gap, S, current_x-1, current_y-1, S1, S2, seq1[current_x] + t1[:], seq2[current_y] + t2[:])
 
 
-def main(seq1, seq2, mode, gap_penalty):
+def main(seq1, seq2, mode, gap=-2):
     file_name = parse_name(mode)
     matrix = load(file_name)
-    F = build_matrics("ATGGC","ACTG", matrix, -2)
+    F = build_matrics(seq1, seq2, matrix, -2)
     S1 = []
     S2 = []
     t1 = ""
     t2 = ""
-    trace_back(" ATGGC", " ACTG", matrix, -2, F, F.shape[0]-1, F.shape[1]-1, S1, S2, t1, t2)
-    print(S1)
-    print(S2)
-    print(F)
+    trace_back(seq1, seq2, matrix, gap, F, F.shape[0]-1, F.shape[1]-1, S1, S2, t1, t2)
+    #print(S1)
+    #print(S2)
+    #print(F)
     return S1, S2, F
 
-
+'''
 if __name__ == '__main__':
     seq1 = "ATGGC"
     seq2 = "ACTG"
 
-    match_score = 5
-    mismatch_score = -5
+
     gap_penalty = -5
     matrix = "BLOSUM 62"
-    S1, S2, F = main(seq1, seq2, match_score, mismatch_score, gap_penalty, matrix)
+    S1, S2, F = main(seq1, seq2, gap_penalty, matrix)
+'''

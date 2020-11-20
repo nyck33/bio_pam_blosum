@@ -19,9 +19,8 @@ from dash_table import DataTable
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 
 # for dropdown
-matrix_names_arr = ['PAM 30', 'PAM 70', 'PAM 250',
-                    'BLOSUM 80', 'BLOSUM 62',
-                     'BLOSUM 45', 'BLOSUM 50', 'BLOSUM 90']
+matrix_names_arr = ['PAM10','PAM30', 'PAM70', 'PAM250',
+                    'BLOSUM62', 'BLOSUM45', 'BLOSUM50', 'BLOSUM80','BLOSUM90']
 
 entrez_page = dbc.Container([
     #########################################################################
@@ -295,7 +294,7 @@ entrez_page = dbc.Container([
                 id='matrix-dropdown',
                 options = [{'label': matrix, 'value': matrix} for matrix in matrix_names_arr
                             ],
-                value="BLOSUM 62"
+                value="BLOSUM62"
             )
         ], width=4),
         dbc.Col([
@@ -321,15 +320,15 @@ entrez_page = dbc.Container([
             html.H3("Needleman Results")
         ], width=12),
         dbc.Col([
-            html.H3("Score"),
-            html.P(
-                id="score"
+            html.H3("Matrix"),
+            html.Div(
+                id="matrix-output"
             )
         ], width=12),
         dbc.Col([
             html.H3("Alignments"),
-            html.P(
-                id="alignments"
+            html.Div(
+                id="alignments-output"
             )
         ], width=12)
     ])
