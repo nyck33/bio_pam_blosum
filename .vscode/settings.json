@@ -1,4 +1,4 @@
 {
     "python.pythonPath": "/home/nobu/anaconda3/envs/bio/bin/python",
-    "python.dataScience.jupyterServerURI": "local"
+    "jupyter.jupyterServerType": "local"
 }

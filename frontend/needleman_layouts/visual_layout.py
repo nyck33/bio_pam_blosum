@@ -10,10 +10,17 @@ from dash_table import DataTable
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
+import os
 
-
+print(os.getcwd())
 #todo: make a plots page
-data = open('project/example_fasta_files/human_v_mus.fasta').read()
+script_dir = os.path.dirname(__file__)
+print(f'scriptdir: {script_dir}')
+rel_path = 'human_v_mus.fasta'
+abs_file_path = os.path.join(script_dir, rel_path)
+print(f'abs_file_path: {abs_file_path}')
+file = 'human_v_mus.fasta'
+data = open(abs_file_path).read()
 plots_page = html.Div([
     dashbio.AlignmentChart(
         id='testchart',

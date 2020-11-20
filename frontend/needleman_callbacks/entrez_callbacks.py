@@ -244,6 +244,8 @@ def register_entrez_callbacks(app):
 
 
 ################################################################################################################################
+# run needle and waterman
+
 # run needle callbacks
     #might need:
     #State('match-slider', 'value') State('mismatch-slider', 'value)
@@ -265,12 +267,28 @@ def register_entrez_callbacks(app):
 
         align_dict = dict(zip(S1, S2))
 
-        alignments_Pre = html.Pre(S1, S2, align_dict,
-                             style={
-                                 'whiteSpace': 'pre-wrap',
-                                 'wordBreak': 'break-all'
-                             }
-                            )
+        alignments_Pre = html.Div([
+            html.Pre(S1,
+                     style={
+                         'whiteSpace': 'pre-wrap',
+                         'wordBreak': 'break-all'
+                     }
+                     ),
+            html.Pre(S2,
+                     style={
+                         'whiteSpace': 'pre-wrap',
+                         'wordBreak': 'break-all'
+                     }
+                     ),
+            html.Pre(align_dict,
+                     style={
+                         'whiteSpace': 'pre-wrap',
+                         'wordBreak': 'break-all'
+                     }
+                     ),
+        ])
+
+
 
         return M, alignments_Pre
 '''

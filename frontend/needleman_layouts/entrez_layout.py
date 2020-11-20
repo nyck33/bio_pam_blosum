@@ -19,9 +19,12 @@ from dash_table import DataTable
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 
 # for dropdown
+'''
 matrix_names_arr = ['PAM10','PAM30', 'PAM70', 'PAM250',
                     'BLOSUM62', 'BLOSUM45', 'BLOSUM50', 'BLOSUM80','BLOSUM90']
-
+'''
+matrix_names_arr = ['PAM30', 'PAM70', 'PAM250',
+                    'BLOSUM62', 'BLOSUM45', 'BLOSUM50', 'BLOSUM80','BLOSUM90']
 entrez_page = dbc.Container([
     #########################################################################
     # debug and store

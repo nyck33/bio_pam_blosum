@@ -95,6 +95,8 @@ def main(seq1, seq2, mode, gap=-2):
     S2 = []
     t1 = ""
     t2 = ""
+    seq1 = " " + seq1
+    seq2 = " " + seq2
     trace_back(seq1, seq2, matrix, gap, F, F.shape[0]-1, F.shape[1]-1, S1, S2, t1, t2)
     #print(S1)
     #print(S2)
