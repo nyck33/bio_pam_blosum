@@ -2,6 +2,7 @@
 
 import numpy as np
 
+#compare two proteins or necleotides. return corresponding matrix score.
 def compare(a, b, matrix):
 
     index_a = matrix[0].index(a)
@@ -9,13 +10,15 @@ def compare(a, b, matrix):
     return int(matrix[index_a+1][index_b+1])
         
 
+#get the filename and return the name
 def parse_name(mode):
-	file_prefix='./sub_matrix/'
+	file_prefix='./matrices/'
 	if mode is 'BLOSUM62':
 		file_name = file_prefix+'BLOSUM62'
 	return file_name
 
 
+#loading the matrix file and return matrix
 def load(file_name):
 	matrix = []
 
@@ -29,24 +32,38 @@ def load(file_name):
 
 	return matrix
 
+#seq 1: first sequence
+#seq 2: second sequence
+#matrix: substitution matrix
+#u, v: penalty score
 def biuld_matrix(seq1, seq2, matrix, v, u):
 	a = len(seq1)
 	b = len(seq2)
 
+	#initiate main score matrix
 	S = np.zeros((a + 1, b + 1))
+	#initiate scoring matrix with no gap
 	H = np.zeros((a + 1, b + 1))
+
+	#initialize matrix that second sequence has gap
 	E = np.zeros((a + 1, b + 1))
+	#initialize matrix that first sequence has gap
 	F = np.zeros((a + 1, b + 1))
 
+	#adding space before each sequence.
 	seq1 = " "+seq1[:]
 	seq2 = " "+seq2[:]
 
 
 	for i in range(1, b+1 if a>b else a+1):
 		for j in range(i, b+1):
+			#set scoring matrix with no gap current position to S[i-1][j-1]+corresponding blosum matrix score
 			H[i,j] = S[i-1,j-1]+compare(seq1[i],seq2[j],matrix)
+			#when first sequence has gap, add gap penalty
 			E[i,j] = max(np.add(S[0:i,j],-(np.arange(i,0,-1)*u+v)))
+			#when second sequence has gap, add gap penalty
 			F[i,j] = max(np.add(S[i,0:j],-(np.arange(j,0,-1)*u+v)))
+			#set the main scoring matrx to the biggest socre from previous three calculations
 			S[i,j] = max([0,H[i,j],E[i,j],F[i,j]])
 		for j in range(i+1, a+1):
 			H[j, i] = S[j-1, i-1]+compare(seq1[j], seq2[i],matrix)
@@ -56,21 +73,32 @@ def biuld_matrix(seq1, seq2, matrix, v, u):
 
 	return S, H, E, F
 
+
+
+#seq1, seq2 are two sequences.
+#v, u: penalty score
+#S, H, E, F scoring matrix from build_matrix function	
+#t1 t2 temporary possible alignment storage
+#S1 S2 Local alignment pair
 def traceback(seq1, seq2, v, u, S, i, j, S1, S2, t1, t2, H, E, F):
 	print(t1, " ", t2, " ", i, " ", j)
+	#if i = 1 and j = 1, edge is reached, store the result to S1 and S2
 	if i == 1 and j == 1:
 		S1.append(seq1[1] + t1[:])
 		S2.append(seq2[1] + t2[:])
 		return
+	#if main score current position is equal to scoring matrix with no gap. move back one position(i-1, j-1).
 	if S[i,j] == H[i,j]:
 		print("first")
 		traceback(seq1, seq2, v, u, S, i - 1, j - 1, S1, S2, seq1[i] + t1[:], seq2[j] + t2[:], H, E, F)
+	#if main score matrix current position is chosen from the matrix that second sequence has gap, then add gap
 	if S[i,j] == E[i,j]:
 		step = np.add(S[0:i,j],-(np.arange(i,0,-1)*u+v))
 		step = list(step)
 		step = i-step.index(E[i, j])
 		print("second", step, E[i,j])
 		traceback(seq1, seq2, v, u, S, i - step, j, S1, S2, seq1[i]+t1[:], "-"*step+t2[:], H, E, F)
+	#if main score matrix current position is chosen from the matrix that first sequence has gap, then add gap to first sequence.
 	if S[i,j] == F[i,j]:
 		step = np.add(S[i, 0:j], -(np.arange(j, 0, -1) * u + v))
 		step = list(step)

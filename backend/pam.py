@@ -3,6 +3,8 @@
 import numpy as np
 import os
 
+
+#return gap penalty or matrix score
 def compare(a, b, matrix, gap):
     if " " == a or b == " ":
         return gap
@@ -11,16 +13,16 @@ def compare(a, b, matrix, gap):
         index_b = matrix[0].index(b)
     return int(matrix[index_a+1][index_b+1])
 
-
+#return file path. if the input is PAM30, it will return the matrices/PAM30
 def parse_name(mode):
     script_dir = os.path.dirname(__file__)
-    rel_path ='sub_matrix/'
+    rel_path ='matrices/'
     matrix_file_path = rel_path + mode
     abs_file_path = os.path.join(script_dir, matrix_file_path)
 
     return abs_file_path
 
-
+#return the matrix based on the input file path.
 def load(file_name):
     matrix = []
     f = open(file_name, 'r')
@@ -34,8 +36,10 @@ def load(file_name):
     return matrix
 
 
-#currently the matrix is looking for minimum number, thus the scoreig
-def build_matrics(seq1, seq2, matrix, gap=-1):
+#currently the matrix is looking for minimum number
+#seq1, seq2 are two input sequences.
+#matrix: input matrics
+def build_matrics(seq1, seq2, matrix, gap):
     a = len(seq1)
     b = len(seq2)
 
@@ -73,43 +77,71 @@ def build_matrics(seq1, seq2, matrix, gap=-1):
     return S
 
 
-def trace_back(seq1, seq2, matrix, gap, S, current_x, current_y, S1, S2, t1, t2):
-    
-    if current_x == 1 and current_y == 1:
+#trace back still needs improve.
+#seq1, seq2: input sequences
+#matrix, read matrix from previous function
+#gap: gap penalty
+#S scoring matrix from previous function
+#current_x, current_y: current matrix row and column
+#S1, S2 alignment sequence
+#t1, t2 temporary alignment sequence
+#score: store score for alignment    ts: temporary score
+def trace_back(seq1, seq2, matrix, gap, S, current_x, current_y, S1, S2, t1, t2, score, ts):
+    #if edge reached, return
+    if current_x == 0 and current_y == 0:   
+        #print("reached here")
         S1.append(seq1[1] + t1[:])
         S2.append(seq2[1] + t2[:])
+        score.append(ts)
         return
-    if S[current_x,current_y]-S[current_x-1,current_y] == gap:
-        trace_back(seq1, seq2, matrix, gap, S, current_x-1, current_y, S1, S2, seq1[current_x]+t1[:], "-"+t2[:])
-    if S[current_x,current_y]-S[current_x,current_y-1] == gap:
-        trace_back(seq1, seq2, matrix, gap, S, current_x, current_y-1, S1, S2, "-" + t1[:], seq2[current_y] + t2[:])
-    if S[current_x,current_y]-S[current_x-1,current_y-1] == compare(seq1[current_x], seq2[current_y], matrix, gap):
-        trace_back(seq1, seq2, matrix, gap, S, current_x-1, current_y-1, S1, S2, seq1[current_x] + t1[:], seq2[current_y] + t2[:])
-
-
-def main(seq1, seq2, mode, gap=-2):
+    #test if x and y reached the edge
+    if current_x>0 and current_y>0:
+        #test if current value is based on x-1 and y-1
+        if S[current_x,current_y]-S[current_x-1,current_y-1] == compare(seq1[current_x], seq2[current_y], matrix, gap):
+            #print(current_x, current_y, t1)
+            ts = ts + S[current_x,current_y]
+            trace_back(seq1, seq2, matrix, gap, S, current_x-1, current_y-1, S1, S2, seq1[current_x] + t1[:], seq2[current_y] + t2[:], score, ts)
+    if current_y>0:
+        #test if current value is based on x and y-1, if yes, there is gap on first sequence.
+        if S[current_x,current_y]-S[current_x,current_y-1] == gap:
+            #print(current_x, current_y, t1)
+            ts = ts + S[current_x,current_y]
+            trace_back(seq1, seq2, matrix, gap, S, current_x, current_y-1, S1, S2, "-" + t1[:], seq2[current_y] + t2[:], score, ts)
+    if current_x>0:
+        #test if current value is based on x-1 and y, if yes, there is a gap on second sequence
+        if S[current_x,current_y]-S[current_x-1,current_y] == gap:
+            #print(current_x, current_y, t1)
+            ts = ts + S[current_x,current_y]
+            trace_back(seq1, seq2, matrix, gap, S, current_x-1, current_y, S1, S2, seq1[current_x]+t1[:], "-"+t2[:], score, ts)
+        
+#seq1 seq2: input sequences
+#mode is what of substitution matrix is going to use. ex "PAM30"
+#gap: gap penalty scores.
+def main():
+    seq1 = "MATLKDQLIYNLLKEEQTPQ"
+    seq2 = "NKITVVGVGAVGMACAISIL"
+    mode="PAM30"
     file_name = parse_name(mode)
     matrix = load(file_name)
-    F = build_matrics(seq1, seq2, matrix, -2)
+    S = build_matrics(seq1, seq2, matrix, -2)
+    score = []
     S1 = []
     S2 = []
     t1 = ""
     t2 = ""
-    seq1 = " " + seq1
-    seq2 = " " + seq2
-    trace_back(seq1, seq2, matrix, gap, F, F.shape[0]-1, F.shape[1]-1, S1, S2, t1, t2)
-    #print(S1)
-    #print(S2)
-    #print(F)
-    return S1, S2, F
+    ts = 0
+    #seq1 = " " + seq1
+    #seq2 = " " + seq2
+    print(S)
+    trace_back(" "+seq1[:], " "+seq2[:], matrix, -2, S, S.shape[0]-1, S.shape[1]-1, S1, S2, t1, t2, score, ts)
+    print(max(score))
+    print(S1[score.index(max(score))])
+    print(S2[score.index(max(score))])
+    #print(S)
+    #return S1, S2, F
 
-'''
+
 if __name__ == '__main__':
-    seq1 = "ATGGC"
-    seq2 = "ACTG"
+    main()
 
 
-    gap_penalty = -5
-    matrix = "BLOSUM 62"
-    S1, S2, F = main(seq1, seq2, gap_penalty, matrix)
-'''

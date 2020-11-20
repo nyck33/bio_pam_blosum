@@ -2,21 +2,30 @@
 
 import numpy as np
 
+#if two inputs are matched, return match score, else return mismatch score
 def compare(m, n, match, mismatch):
     if m == n:
         return match
     else:
         return mismatch
 
+#seq 1: first sequence
+#seq 2: second sequence
+#match, mismatch: match score and mismatch score.
+#u, v: penalty score
 def biuld_matrix(seq1, seq2, match, mismatch, v, u):
 	a = len(seq1)
 	b = len(seq2)
-
+	#initiate main score matrix
 	S = np.zeros((a + 1, b + 1))
+	#initiate scoring matrix with no gap
 	H = np.zeros((a + 1, b + 1))
+	#initialize matrix that second sequence has gap
 	E = np.zeros((a + 1, b + 1))
+	#initialize matrix that first sequence has gap
 	F = np.zeros((a + 1, b + 1))
 
+	#adding space before each sequence.
 	seq1 = " "+seq1[:]
 	seq2 = " "+seq2[:]
 
@@ -36,35 +45,35 @@ def biuld_matrix(seq1, seq2, match, mismatch, v, u):
 	return S, H, E, F
 
 def traceback(seq1, seq2, v, u, S, i, j, S1, S2, t1, t2, H, E, F):
-	print(t1, " ", t2, " ", i, " ", j)
+	#print(t1, " ", t2, " ", i, " ", j)
 	if i == 1 and j == 1:
 		S1.append(seq1[1] + t1[:])
 		S2.append(seq2[1] + t2[:])
 		return
 	if S[i,j] == H[i,j]:
-		print("first")
+		#print("first")
 		traceback(seq1, seq2, v, u, S, i - 1, j - 1, S1, S2, seq1[i] + t1[:], seq2[j] + t2[:], H, E, F)
 	if S[i,j] == E[i,j]:
 		step = np.add(S[0:i,j],-(np.arange(i,0,-1)*u+v))
 		step = list(step)
 		step = i-step.index(E[i, j])
-		print("second", step, E[i,j])
+		#print("second", step, E[i,j])
 		traceback(seq1, seq2, v, u, S, i - step, j, S1, S2, seq1[i]+t1[:], "-"*step+t2[:], H, E, F)
 	if S[i,j] == F[i,j]:
 		step = np.add(S[i, 0:j], -(np.arange(j, 0, -1) * u + v))
 		step = list(step)
 		step = j - step.index(F[i, j])
-		print("third", step)
+		#print("third", step)
 		traceback(seq1, seq2, v, u, S, i, j-step, S1, S2, "-"*step+t1[:], seq2[j]+t2[:], H, E, F)
 
 
 
 S, H, E, F = biuld_matrix("CTATAATCCC", "CTGTATC", 1, -1, 1, 1)
 
-print("S = ",np.around(S,2))
-print("H = ",np.around(H,2))
-print("E = ",np.around(E,2))
-print("F = ",np.around(F,2))
+#print("S = ",np.around(S,2))
+#print("H = ",np.around(H,2))
+#print("E = ",np.around(E,2))
+#print("F = ",np.around(F,2))
  
 S1 = []
 S2 = []
