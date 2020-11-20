@@ -88,28 +88,27 @@ def trace_back(seq1, seq2, matrix, gap, S, current_x, current_y, S1, S2, t1, t2)
         trace_back(seq1, seq2, matrix, gap, S, current_x-1, current_y-1, S1, S2, seq1[current_x] + t1[:], seq2[current_y] + t2[:])
 
 
-def main(seq1, seq2, match_score, mismatch_score, gap_penalty):
-	'''
-	mode='PAM30'
-	file_name = parse_name(mode)
-	matrix = load(file_name)
-	F = build_matrics("ATGGC","ACTG", matrix, -2)
-	S1 = []
-	S2 = []
-	t1 = ""
-	t2 = ""
-	trace_back(" ATGGC", " ACTG", matrix, -2, F, F.shape[0]-1, F.shape[1]-1, S1, S2, t1, t2)
-	print(S1)
-	print(S2)
-	print(F)
-	'''
-    #return S1, S2, F
-if __name__ == '__main__':
-	seq1 = "ATGGC"
-	seq2 = "ACTG"
+def main(seq1, seq2, mode, gap_penalty):
+    file_name = parse_name(mode)
+    matrix = load(file_name)
+    F = build_matrics("ATGGC","ACTG", matrix, -2)
+    S1 = []
+    S2 = []
+    t1 = ""
+    t2 = ""
+    trace_back(" ATGGC", " ACTG", matrix, -2, F, F.shape[0]-1, F.shape[1]-1, S1, S2, t1, t2)
+    print(S1)
+    print(S2)
+    print(F)
+    return S1, S2, F
 
-	match_score = 5
-	mismatch_score = -5
-	gap_penalty = -5
-	matrix = "BLOSUM 62"
-	S1, S2, F = main(seq1, seq2, match_score, mismatch_score, gap_penalty, matrix)
+
+if __name__ == '__main__':
+    seq1 = "ATGGC"
+    seq2 = "ACTG"
+
+    match_score = 5
+    mismatch_score = -5
+    gap_penalty = -5
+    matrix = "BLOSUM 62"
+    S1, S2, F = main(seq1, seq2, match_score, mismatch_score, gap_penalty, matrix)

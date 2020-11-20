@@ -5,18 +5,19 @@ import xmltodict
 def get_last_updated(record):
     return record['DbInfo']['LastUpdate']
 
-def searchByTerm(db, term):
+def searchByTerm(term):
     """
     search by term to get a list of accession numbers next to description
     :param term:
     :return: queryTranslation and accession numbers
     """
+    db="protein"
     eSearch = Entrez.esearch(db=db, term=term, idtype="acc")
     res = Entrez.read(eSearch)
     accessions_arr = res['IdList']
     query_translation = res['QueryTranslation']
 
-    return query_translation, accessions_arr
+    return accessions_arr, query_translation
 
 
 def get_full_GB_info(accession):

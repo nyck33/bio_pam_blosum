@@ -38,11 +38,11 @@ entrez_page = dbc.Container([
                 "check store 2",
                 id="check-store-2"
             ),
-            html.Pre(
+            html.Div(
                 "context checker",
                 id='ctx-check'
             ),
-            html.Div(
+            html.Div(  # receive preformatted text html.Pre, for uploads
                 "other debug output",
                 id='debug-out'
             )
@@ -62,7 +62,6 @@ entrez_page = dbc.Container([
                 type="text",
                 size="50"
             ),
-            html.Br(),
             dbc.Button(
                 'Search 1',
                 id='btn-acc-1',
@@ -77,9 +76,9 @@ entrez_page = dbc.Container([
                 size="50"
             ),
             dbc.Button(
-                'Search 1',
+                'Search 2',
                 id='btn-acc-2',
-                color="primary",
+                color="secondary",
                 n_clicks=0
             )
 
@@ -128,19 +127,20 @@ entrez_page = dbc.Container([
                 color="primary",
                 n_clicks=0
             ),
-            html.Br(),
-            html.P(
-                "query translation output",
-                id="query-translation-output"
-            ),
+
         ], width=12)
     ]),
     dbc.Row([
         dbc.Col([
-            html.Label("Accession Search Results appear here"),
+            html.Label("NCBI Search by Text Results appear here"),
             html.Div(
                 # full fasta for accession num input
-                id="accession-search-res"
+                id="ncbi-textsearch-res"
+            ),
+            html.Br(),
+            html.P(
+                "query translation output",
+                id="query-translation-output"
             ),
         ], width=12)
     ]),
@@ -209,14 +209,18 @@ entrez_page = dbc.Container([
     html.Hr(),
     dbc.Row([
         dbc.Col([
-            html.H3("3. Manual Input of Sequences"),
+            html.H3("3. Manual Input of Sequences, no headers, sequences only"),
+            html.P(
+                "Copy and Paste or Type",
+                id="text-instruction"
+            )
         ], width=12),
         dbc.Col([
             html.Label("sequence 1"),
             html.Br(),
             dcc.Textarea(
                 id='fasta-text-area',
-                placeholder="type your fasta sequence here",
+                placeholder="type sequence 1 here",
                 style={'width': '100%', 'height': 300}
             ),
             html.Br(),
