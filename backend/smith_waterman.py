@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+from Bio import SeqIO
 
 #if two inputs are matched, return match score, else return mismatch score
 def compare(m, n, match, mismatch):
@@ -67,8 +68,16 @@ def traceback(seq1, seq2, v, u, S, i, j, S1, S2, t1, t2, H, E, F):
 		traceback(seq1, seq2, v, u, S, i, j-step, S1, S2, "-"*step+t1[:], seq2[j]+t2[:], H, E, F)
 
 
+seq1 = SeqIO.read("example_fasta_files/homo_sapiens_lactate.fasta", "fasta")
+seq2 = SeqIO.read("example_fasta_files/mus_musculus_lactate.fasta", "fasta")
+# cast to string
+mat_str_a = str(seq1.seq)
+mat_str_b = str(seq2.seq)
 
-S, H, E, F = biuld_matrix("CTATAATCCC", "CTGTATC", 1, -1, 1, 1)
+a_str = " " + str(seq1.seq)
+b_str = " " + str(seq1.seq)
+
+S, H, E, F = biuld_matrix(mat_str_a, mat_str_b, 1, -1, 1, 1)
 
 #print("S = ",np.around(S,2))
 #print("H = ",np.around(H,2))
@@ -80,8 +89,13 @@ S2 = []
 t1 = ""
 t2 = ""
 R = np.where(S == np.max(S))
+
+#demo strings
+#a= " CTATAATCCC"
+#b= " CTGTATC"
+
 for x, y in zip(R[0],R[1]):
-    traceback(" CTATAATCCC", " CTGTATC", 1, 1, S, x, y, S1, S2, t1, t2, H, E, F)
+    traceback(a_str, b_str, 1, 1, S, x, y, S1, S2, t1, t2, H, E, F)
 print(S1)
 print(S2)
 

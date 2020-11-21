@@ -262,23 +262,36 @@ def register_entrez_callbacks(app):
     #State('match-slider', 'value') State('mismatch-slider', 'value)
     @app.callback([Output('matrix-output', 'children'),
                    Output('alignments-output', 'children')],
-                  [Input('submit-fastas', 'n_clicks')
+                  [Input('run-needleman', 'n_clicks')
                    Input('run-waterman', 'n_clicks')],
                   [State('sequence-1-store', 'data'),
                    State('sequence-2-store', 'data'),
                    State('gap-penalty-slider', 'value'),
                    State('matrix-dropdown', 'value')])
-    def run_needleman(run_btn, seq1_json, seq2_json, gap, matrix):
-        if run_btn <=0:
+    def run_needleman(btn_needle, btn_waterman, seq1_json, seq2_json,
+                        gap, matrix):
+        if btn_needle <=0:
             return no_update, no_update
+
+        ctx = callback_context
+        trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+        ctx_msg = json.dumps({
+            'states': ctx.states,
+            'triggered': ctx.triggered,
+            'inputs': ctx.inputs
+        }, indent=2)
 
         seq1 = json.loads(seq1_json)
         seq2 = json.loads(seq2_json)
 
-        S1, S2, M = main(seq1, seq2, matrix, gap)
+        if trigger=='run-needleman':
+            S1, S2, M = main(seq1, seq2, matrix, gap)
 
+
+        # S1 and S2 are arrs corresponding to each other so make dict
         align_dict = dict(zip(S1, S2))
 
+        # try to return a Pre
         alignments_Pre = html.Div([
             html.Pre(S1,
                      style={
