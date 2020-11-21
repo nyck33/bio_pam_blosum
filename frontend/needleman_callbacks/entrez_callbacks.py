@@ -228,19 +228,30 @@ def register_entrez_callbacks(app):
         Input('btn-search-ncbi', 'n_clicks'),
         State('term-search-input', 'value')
     )
-    def get_accessions_arr(btn_search, searchterm):
+    def get_accessions_from_text(btn_search, searchterm):
+        """
+
+        :param btn_search:
+        :param searchterm:
+        :return: html Pre of array of accessions, str query translation
+        """
         if btn_search<=0:
             return no_update, no_update
         accessions_arr, query_translation = searchByTerm(searchterm)
 
-        acc_arr_Pre = html.Pre(accessions_arr[:],
-                    style={
-                        'whiteSpace': 'pre-wrap',
-                        'wordBreak': 'break-all'
-                    })
+        #return A links, click for full GB info
+        acc_arr_links = html.Div(
+                    children=[
+                    html.P(
+                    html.A(accessions_arr[i],
+                    n_clicks=0,
+                    href=f"https://www.ncbi.nlm.nih.gov/search/all/?term={accessions_arr[i]}",
+                    target="_blank",
+                    id=f'link-{accessions_arr[i]}'))
+                        for i in range(len(accessions_arr))])
 
-        return acc_arr_Pre, query_translation
 
+        return acc_arr_links, query_translation
 
 
 ################################################################################################################################
@@ -251,7 +262,8 @@ def register_entrez_callbacks(app):
     #State('match-slider', 'value') State('mismatch-slider', 'value)
     @app.callback([Output('matrix-output', 'children'),
                    Output('alignments-output', 'children')],
-                  [Input('submit-fastas', 'n_clicks')],
+                  [Input('submit-fastas', 'n_clicks')
+                   Input('run-waterman', 'n_clicks')],
                   [State('sequence-1-store', 'data'),
                    State('sequence-2-store', 'data'),
                    State('gap-penalty-slider', 'value'),
@@ -290,7 +302,7 @@ def register_entrez_callbacks(app):
 
 
 
-        return M, alignments_Pre
+        return "convert 2d array to list or else", alignments_Pre
 '''
 # run needle engine and output as check
         # todo: call main(param)

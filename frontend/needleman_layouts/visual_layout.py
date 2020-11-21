@@ -21,13 +21,26 @@ abs_file_path = os.path.join(script_dir, rel_path)
 print(f'abs_file_path: {abs_file_path}')
 file = 'human_v_mus.fasta'
 data = open(abs_file_path).read()
-plots_page = html.Div([
-    dashbio.AlignmentChart(
-        id='testchart',
-        data=data,
-        colorscale='hydro',
-        conservationcolorscale='blackbody',
-        tilewidth=50
-    ),
-    html.Div(id='alignment-output')
+plots_page = dbc.Container([
+    dbc.Row([
+        dbc.Col([
+            html.H3("Demo of Dash Bio Alignment"),
+            html.P(
+                "Alignment of Homo sapiens lactate protein "
+                "with Mus musculus lactate protein "
+                "from lab or assignment"
+            ),
+            html.Div([
+            dashbio.AlignmentChart(
+                id='testchart',
+                data=data,
+                colorscale='hydro',
+                conservationcolorscale='blackbody',
+                tilewidth=50
+            ),
+            html.Div(id='alignment-output')
+            ])
+        ], width=12)
+    ])
 ])
+

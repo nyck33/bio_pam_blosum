@@ -55,8 +55,6 @@ app.title = "Needleman Wunsch and NCBI"
 #######################################################################
 #register callbacks
 register_entrez_callbacks(app)
-#register_intro_callbacks(app)
-
 ###############################################################
 SIDEBAR_STYLE={
     "position": "fixed",
@@ -77,16 +75,16 @@ CONTENT_STYLE = {
 #layout components on every page
 sidebar = html.Div(
     [
-        html.H3("PAM BLOSUM + NCBI API", className='display-4'),
+        html.H3("PAM BLOSUM + NCBI", className='display-4'),
         html.Hr(),
         html.P(
             "Choose page to display", className="lead"
         ),
         dbc.Nav(# todo: show res below params using callback and plots on plots
             [
-                dbc.NavLink("Needleman Wunsch intro", href="/project-intro", id="intro-link"),
-                dbc.NavLink("Entrez Gene and Parameters", href="/entrez-parameters", id="parameters-link"),
-                dbc.NavLink("Plots of Results", href="/plots", id="plots"),
+                dbc.NavLink("Project intro", href="/project-intro", id="intro-link"),
+                dbc.NavLink("Entrez Search, Needleman-Wunsch, Smith-Waterman", href="/entrez-parameters", id="parameters-link"),
+                dbc.NavLink("Dash Bio Demo", href="/plots", id="plots"),
             ],
             vertical=True,
             pills=True,

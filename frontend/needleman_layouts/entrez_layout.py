@@ -140,10 +140,14 @@ entrez_page = dbc.Container([
                 id="ncbi-textsearch-res"
             ),
             html.Br(),
-            html.P(
+            html.Div(
                 "query translation output",
                 id="query-translation-output"
             ),
+            html.Div(
+                "full GB output",
+                id="gb=output"
+            )
         ], width=12)
     ]),
     html.Hr(),
@@ -155,12 +159,12 @@ entrez_page = dbc.Container([
             html.Label("fasta file 1"),
             dcc.Upload(
                 id='upload-data',
-                children=html.Div([
-                    "Drag and Drop or ",
-                    html.A('Select Fasta Files')
-                ]),
+                children=html.Div(
+                    "Drag and Drop or \n"
+                    "Select Fasta from Files"
+                ),
                 style={
-                    'width': '70%',
+                    'width': '95%',
                     'height': '100px',
                     'lineHeight': '60px',
                     'borderWidth': '1px',
@@ -177,11 +181,11 @@ entrez_page = dbc.Container([
             dcc.Upload(
                 id='upload-data-two',
                 children=html.Div([
-                    "Drag and Drop or ",
-                    html.A('Select Fasta Files')
+                    "Drag and Drop or "
+                    "Select Fasta from Files"
                 ]),
                 style={
-                    'width': '70%',
+                    'width': '95%',
                     'height': '100px',
                     'lineHeight': '60px',
                     'borderWidth': '1px',
@@ -303,12 +307,22 @@ entrez_page = dbc.Container([
         dbc.Col([
             html.Br(),
             dbc.Button(
-                'Run Needleman Wunsch',
-                id='submit-fastas',
+                'Run Needleman-Wunsch (global)',
+                id='run-needleman',
                 color="success",
                 n_clicks=0
             )
+        ], width=4),
+        dbc.Col([
+            html.Br(),
+            dbc.Button(
+                'Run Smith-Waterman (local)',
+                id='run-',
+                color="run-waterman",
+                #n_clicks=0
+            )
         ], width=4)
+
     ]),
     dbc.Row([
         dbc.Col([
