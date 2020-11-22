@@ -21,19 +21,8 @@ import numpy as np
 import os
 import copy
 
-ex_seq1 = "MATLKDQLIVNLLKEEQAPQNKITVVGVGAVGMACAISILMKDLADELALVDVMEDKLKGEMMDLQHGSL"
-+"FLKTPKIVSSKDYCVTANSKLVIITAGARQQEGESRLNLVQRNVNIFKFIIPNIVKYSPHCKLLIVSNPV"
-+"DILTYVAWKISGFPKNRVIGSGCNLDSARFRYLMGERLGVHALSCHGWVLGEHGDSSVPVWSGVNVAGVS"
-+"LKSLNPELGTDADKEQWKEVHKQVVDSAYEVIKLKGYTSWAIGLSVADLAESIMKNLRRVHPISTMIKGL"
-+"YGINEDVFLSVPCILGQNGISDVVKVTLTPEEEARLKKSADTLWGIQKELQF"
-
-ex_seq2 = "MATLKDQLIYNLLKEEQTPQNKITVVGVGAVGMACAISILMKDLADELALVDVIEDKLKGEMMDLQHGSL"
-+"FLRTPKIVSGKVDILTYVAWKISGFPKNRVIGSGCNLDSARFRYLMGERLGVHPLSCHGWVLGEHGDSSV"
-+"PVWSGMNVAGVSLKTLHPDLGTDKDKEQWKEVHKQVVESAYEVIKLKGYTSWAIGLSVADLAESIMKNLR"
-+"RVHPVSTMIKGLYGIKDDVFLSVPCILGQNGISDLVKVTLTSEEEARLKKSADTLWGIQKELQF"
-
 class Needleman():
-    def __init__(self, seq_a="", seq_b="FX", mat_name="BLOSUM62", rel_path='sub_matrix/',
+    def __init__(self, seq_a='MATLKDQ', seq_b="MATLKDQLI", mat_name="BLOSUM62", rel_path='sub_matrix/',
                  gap=-5, gap_open=-10, gap_extend=-2):
         # {amino alpha : amino code}, can give each amino in sequences a code
         self.rel_path = rel_path
@@ -48,7 +37,10 @@ class Needleman():
         self.matrix = np.zeros((1, 1), dtype=int)
         # the matrix with longer sequence in the top row
         self.trav_mat = np.zeros((1, 1), dtype=int)
+        self.optimal_score = 0
         self.alignment_pos_arr = []
+        self.aligned_dict = {}
+        self.full_aligned_dict = {}
 
 
 
@@ -154,12 +146,20 @@ class Needleman():
     def build_seq_matrix(self):
         """
         build the matrix from 2 sequences to traverse
+        shorter seq along top row
         :return:
         """
         seq_a = self.seqA
         seq_b = self.seqB
-        num_rows = len(seq_a) + 1
-        num_cols = len(seq_b) + 1
+        len_a = len(seq_a)
+        len_b = len(seq_b)
+        if len_a > len_b or len_a == len_b:
+            num_rows = len(seq_a) + 1
+            num_cols = len(seq_b) + 1
+        else:
+            num_rows = len(seq_b) + 1
+            num_cols = len(seq_a) + 1
+
         trav_mat = np.zeros((num_rows, num_cols), dtype=int)
         amino_dict = self.amino_dict
         for i in range(num_rows):
@@ -232,6 +232,8 @@ class Needleman():
             for j in range(2, cols, 1):
                 trav_mat[i, j] = self.find_max(trav_mat, i, j)
 
+        #bottom right represents score of optima alignment
+        self.optimal_score = trav_mat[rows-1, cols-1]
         self.trav_mat = np.copy(trav_mat)
 
     def check_OB(self, row, col):
@@ -241,10 +243,12 @@ class Needleman():
 
     def traceback(self):
         """
-        start at bottom right of trav_mat, check which paths north, west
+        1.  start at bottom right of trav_mat, check which paths north, west
         and nw are correct, make new lists, copy old path over and the lists
-        reamining at the end are the full paths from bottom right to top left
-
+        remaining at the end are the full paths from bottom right to top left
+        2.  while traversing, instead of cell pos, make lists of "-" or "alpha"
+        ***moving up means gap in top row seq, move left is gap in
+        left col seq***
         :return: list of lists of paths
         """
         score_mat = np.copy(self.matrix)
@@ -313,11 +317,25 @@ class Needleman():
     def alignments_to_strings(self):
         """
         Align shorter sequence against longer one, step into (1,1)
+        for the last amino acid (or the first since it's reverse)
         starting at bottom right
         Output both aligned areas only and full alignments
-        :return:
+        ***moving up means gap in top row seq, move left is gap in
+        left col seq***
+        :return: dictionary of {seq1: seq2} aligned only and
+        full alignments
+        Get to (1,1) then add the first alpha to each seq (can only go to
+        (0,0))
+        Reverse each string and append to alignments arr
         """
         align_pos_arr = copy.deepcopy(self.alignment_pos_arr)
+        alignments_arr = []
+        # each starts at bottom right
+        for i in range (len(align_pos_arr)):
+            start = align_pos_arr[i]
+            if start == (1,1):
+                end = align_pos_arr[i+1]
+
 
 
     def main(self):
@@ -329,11 +347,29 @@ class Needleman():
         # build the score matrix
         self.build_score_matrix(score_lines_arr)
         # build seq_matrix with amino_codes in top row, left col
+        # shorter alignment along top row
         self.build_seq_matrix()
         # initialize first row and col
         self.initialize_row_col()
         # traverse
         self.traverse()
         self.traceback()
+        # align top row against left col seq
+        #self.alignments_to_strings()
 
+if __name__ == "__main__":
+    """
+    def __init__(self, seq_a='MATLKDQ', seq_b="MATLKDQLI", mat_name="BLOSUM62", rel_path='sub_matrix/',
+                 gap=-5, gap_open=-10, gap_extend=-2):
+    """
+    homosapiens_lactate = "MATLKDQLIVNLLKEEQAPQNKITVVGVGAVGMACAISILMKDLADELALVDVMEDKLKGEMMDLQHGSL"
+    +"FLKTPKIVSSKDYCVTANSKLVIITAGARQQEGESRLNLVQRNVNIFKFIIPNIVKYSPHCKLLIVSNPV"
+    +"DILTYVAWKISGFPKNRVIGSGCNLDSARFRYLMGERLGVHALSCHGWVLGEHGDSSVPVWSGVNVAGVS"
+    +"LKSLNPELGTDADKEQWKEVHKQVVDSAYEVIKLKGYTSWAIGLSVADLAESIMKNLRRVHPISTMIKGL"
+    +"YGINEDVFLSVPCILGQNGISDVVKVTLTPEEEARLKKSADTLWGIQKELQF"
+
+    mus_lactate = "MATLKDQLIYNLLKEEQTPQNKITVVGVGAVGMACAISILMKDLADELALVDVIEDKLKGEMMDLQHGSL"
+    +"FLRTPKIVSGKVDILTYVAWKISGFPKNRVIGSGCNLDSARFRYLMGERLGVHPLSCHGWVLGEHGDSSV"
+    +"PVWSGMNVAGVSLKTLHPDLGTDKDKEQWKEVHKQVVESAYEVIKLKGYTSWAIGLSVADLAESIMKNLR"
+    +"RVHPVSTMIKGLYGIKDDVFLSVPCILGQNGISDLVKVTLTSEEEARLKKSADTLWGIQKELQF"
 

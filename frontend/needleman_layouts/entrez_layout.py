@@ -86,20 +86,7 @@ entrez_page = dbc.Container([
 
         ], width=12),
     ]),
-    dbc.Row([ # results of accession search
-        dbc.Col([
-            html.P(
-                "fasta res 1 here",
-                id='accession-fasta-1',
-            ),
-        ], width=6),
-        dbc.Col([
-            html.P(
-                "fasta res 2 here",
-                id='accession-fasta-2'
-            )
-        ], width=6)
-    ]),
+
     html.Hr(),
     ################################################################
     #NCBI search area
@@ -198,20 +185,7 @@ entrez_page = dbc.Container([
             ),
         ], width=6)
     ]),
-    dbc.Row([
-        dbc.Col([
-            html.P("Check upload contents sequence 1"),
-            html.Div(  # show the uploaded file contents as string
-                id="output-data-upload"
-            ),
-        ], width=12),
-        dbc.Col([
-            html.P("Check upload contents (if) sequence 2"),
-            html.Div(  # show the uploaded file contents as string
-                id="output-data-upload-two"
-            ),
-        ], width=12)
-    ]),
+
     html.Hr(),
     dbc.Row([
         dbc.Col([
@@ -258,41 +232,40 @@ entrez_page = dbc.Container([
     #Let’s say match is 1-10 mismatch is -1 to -10. Gap penalty is -1 to -10 as well
     dbc.Row([
         dbc.Col([
-            html.Label("match score, default=5"),
+            html.P(
+                "Better alignments are usually obtained by penalizing gaps: " 
+                "higher costs for opening a gap and lower costs for extending "
+                "an existing gap. For amino acid sequences match scores are usually " 
+                "encoded in matrices like PAM or BLOSUM. Defaults are -10 and -0.5."
+            )
+        ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Label("gap-open penalty"),
             html.Br(),
             dcc.Slider(
-                id="match-slider",
-                min=1,
-                max=10,
-                step=1,
-                value=5,
+                id="gap-open-slider",
+                min=-20,
+                max=-0,
+                step=0.5,
+                value=-10,
             ),
-            html.Div(id="match-slider-val")
+            html.Div(id="gap-open-slider-val")
         ], width=4),
         dbc.Col([
-            html.Label('mismatch score, default=5'),
+            html.Label('gap-extend penalty'),
             html.Br(),
             dcc.Slider(
-                id='mismatch-slider',
-                min=-10,
-                max=-1,
-                step=1,
-                value=-5,
+                id='gap-extend-slider',
+                min=-5,
+                max=0,
+                step=0.5,
+                value=-0.5,
             ),
-            html.Div(id="mismatch-slider-val")
+            html.Div(id="gap-extend-slider-val")
         ], width=4),
-        dbc.Col([
-            html.Label('gap penalty, default=-5'),
-            html.Br(),
-            dcc.Slider(
-                id='gap-penalty-slider',
-                min=-10,
-                max=-1,
-                step=1,
-                value=-5,
-            ),
-            html.Div(id="gap-penalty-slider-val"),
-        ], width=4)
+
     ]),
     dbc.Row([
         dbc.Col([
@@ -317,9 +290,9 @@ entrez_page = dbc.Container([
             html.Br(),
             dbc.Button(
                 'Run Smith-Waterman (local)',
-                id='run-',
-                color="run-waterman",
-                #n_clicks=0
+                id='run-waterman',
+                color="success",
+                n_clicks=0
             )
         ], width=4)
 
@@ -334,20 +307,47 @@ entrez_page = dbc.Container([
     html.Hr(),
     dbc.Row([
         dbc.Col([
-            html.H3("Needleman Results")
-        ], width=12),
-        dbc.Col([
-            html.H3("Matrix"),
-            html.Div(
-                id="matrix-output"
+            html.H3("Needleman Results"),
+            html.P(
+                "Alignments now contains a list of alignments " 
+                "(at least one) which have the same optimal score for the given "
+                "conditions. Bio.pairwise2 will return up to 1000 alignments)."
             )
         ], width=12),
         dbc.Col([
-            html.H3("Alignments"),
+            html.H3("Global Alignments"),
             html.Div(
-                id="alignments-output"
+                id="needleman-output"
             )
         ], width=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.H3("Waterman Results"),
+            html.P(
+                "Alignments now contains a list of alignments " 
+                "(at least one) which have the same optimal score for the given "
+                "conditions. Bio.pairwise2 will return up to 1000 alignments)."
+            )
+        ], width=12),
+        dbc.Col([
+            html.H3("Local Alignments"),
+            html.Div(
+                id="waterman-output"
+            )
+        ], width=12),
+        dbc.Col([
+            html.H3("Needle Water context check"),
+            html.Div(
+                id="needle-water-ctx"
+            )
+        ], width=12),
+        dbc.Col([
+            html.H3("test format"),
+            html.P(
+
+            )
+        ], width=12),
     ])
 ])
 

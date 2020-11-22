@@ -18,9 +18,12 @@ from dash_table import DataTable
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State  # Load Data
+from Bio import pairwise2
+from Bio import SeqIO
+from Bio.Align import substitution_matrices
 
 #import layouts
-from frontend.needleman_layouts.entrez_layout import entrez_page #, register_entrez_callbacks
+from frontend.needleman_layouts.entrez_layout import entrez_page, matrix_names_arr
 from frontend.needleman_layouts.intro_layout import needleman_intro
 from frontend.needleman_layouts.visual_layout import plots_page
 

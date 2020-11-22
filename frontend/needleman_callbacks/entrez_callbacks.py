@@ -3,6 +3,7 @@ import datetime
 import io
 import pandas as pd
 import json
+import textwrap
 
 import dash_bio as dashbio
 import six.moves.urllib.request as urlreq
@@ -17,12 +18,15 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
 from Bio import SeqIO
+from Bio import pairwise2
+from Bio.Align import substitution_matrices
 
 #import ncbi search class
 from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
 from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
 from backend.pam import main, trace_back, build_matrics, load, parse_name, compare
-
+#import needleman
+from backend.bio_needleman import Needleman
 
 def register_entrez_callbacks(app):
     #debug json stores
@@ -47,26 +51,18 @@ def register_entrez_callbacks(app):
     #slider callbacks
 
     @app.callback(
-        Output('match-slider-val', 'children'),
-        [Input('match-slider', 'value')])
-    def show_match_slider_val(match_value):
-        val_string = f'match score: {match_value}'
+        Output('gap-open-slider-val', 'children'),
+        [Input('gap-open-slider', 'value')])
+    def show_gap_open_slider_val(gap_open_val):
+        val_string = f'match score: {gap_open_val}'
         return val_string
 
 
-    @app.callback(Output('mismatch-slider-val', 'children'),
-                  [Input('mismatch-slider', 'value')])
-    def show_mismatch_slider_val(mismatch_value):
-        val_string = f'mismatch score: {mismatch_value}'
+    @app.callback(Output('gap-extend-slider-val', 'children'),
+                  [Input('gap-extend-slider', 'value')])
+    def show_gap_extend_slider_val(gap_extend_val):
+        val_string = f'mismatch score: {gap_extend_val}'
         return val_string
-
-
-    @app.callback(Output('gap-penalty-slider-val', 'children'),
-                  [Input('gap-penalty-slider', 'value')])
-    def show_gap_pen_slider_val(gap_pen_value):
-        val_string = f'gap penalty: {gap_pen_value}'
-        return val_string
-
 
     ######################################################################
     # Update the dcc.Store from whichever input/button combo is pressed
@@ -250,28 +246,25 @@ def register_entrez_callbacks(app):
                     id=f'link-{accessions_arr[i]}'))
                         for i in range(len(accessions_arr))])
 
-
         return acc_arr_links, query_translation
-
 
 ################################################################################################################################
 # run needle and waterman
-
-# run needle callbacks
-    #might need:
-    #State('match-slider', 'value') State('mismatch-slider', 'value)
-    @app.callback([Output('matrix-output', 'children'),
-                   Output('alignments-output', 'children')],
-                  [Input('run-needleman', 'n_clicks')
-                   Input('run-waterman', 'n_clicks')],
-                  [State('sequence-1-store', 'data'),
-                   State('sequence-2-store', 'data'),
-                   State('gap-penalty-slider', 'value'),
-                   State('matrix-dropdown', 'value')])
+    @app.callback(
+        [Output('needleman-output', 'children'),
+       Output('waterman-output', 'children'),
+       Output('needle-water-ctx', 'children')],
+      [Input('run-needleman', 'n_clicks'),
+       Input('run-waterman', 'n_clicks')],
+      [State('sequence-1-store', 'data'),
+       State('sequence-2-store', 'data'),
+       State('gap-open-slider', 'value'),
+       State('gap-extend-slider', 'value'),
+       State('matrix-dropdown', 'value')])
     def run_needleman(btn_needle, btn_waterman, seq1_json, seq2_json,
-                        gap, matrix):
-        if btn_needle <=0:
-            return no_update, no_update
+                        gap_open, gap_extend, mat_name):
+        if btn_needle <=0 and btn_waterman <=0:
+            return no_update, no_update, no_update
 
         ctx = callback_context
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]
@@ -284,40 +277,47 @@ def register_entrez_callbacks(app):
         seq1 = json.loads(seq1_json)
         seq2 = json.loads(seq2_json)
 
+        # instantiate class
+        needle = Needleman(seq1, seq2, mat_name, gap_open, gap_extend)
+        needle.load_matrix()
+        align_str_arr = []
         if trigger=='run-needleman':
-            S1, S2, M = main(seq1, seq2, matrix, gap)
+            needle.align_global()
+            # get list of named tuples
+            alignments = needle.alignments
+            alignments_html = format_output(alignments)
+            return alignments_html, no_update, ctx_msg
 
+        if trigger=="run-waterman":
+            needle.align_local()
+            alignments = needle.alignments
+            alignments_html = format_output(alignments)
+            return no_update, alignments_html, ctx_msg
 
-        # S1 and S2 are arrs corresponding to each other so make dict
-        align_dict = dict(zip(S1, S2))
+    def format_output(alignments):
+        """
 
-        # try to return a Pre
-        alignments_Pre = html.Div([
-            html.Pre(S1,
-                     style={
-                         'whiteSpace': 'pre-wrap',
-                         'wordBreak': 'break-all'
-                     }
-                     ),
-            html.Pre(S2,
-                     style={
-                         'whiteSpace': 'pre-wrap',
-                         'wordBreak': 'break-all'
-                     }
-                     ),
-            html.Pre(align_dict,
-                     style={
-                         'whiteSpace': 'pre-wrap',
-                         'wordBreak': 'break-all'
-                     }
-                     ),
+        :param alignments:
+        :return: alignments_html
+        """
+        # format output results in string
+        align_str_arr = []
+        for i in range(len(alignments)):
+            align_str = pairwise2.format_alignment(*alignments[i])
+            align_str_arr.append(align_str)
+        print(f'align_str:\n{align_str_arr[0]}')
+        alignments_html = html.Div([
+            html.P(
+                align_str_arr[i]
+            ) for i in range(len(align_str_arr))
         ])
 
-
-
-        return "convert 2d array to list or else", alignments_Pre
-'''
-# run needle engine and output as check
-        # todo: call main(param)
-        S!, S2, F = main(params)
-'''
+        '''
+        alignments_html = html.Pre(
+            align_str_arr[:],
+            style={
+                'whiteSpace':
+            }
+        )
+        '''
+        return alignments_html
