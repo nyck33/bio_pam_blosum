@@ -1,87 +1,151 @@
 #!/usr/bin/env python3
 
 import numpy as np
+from Bio import SeqIO
+import os
+
+
+class smith_waterman():
+	def __init__(self, seq1, seq2, matrix_name="", match=2, mismatch=-3, gap_open=-10, gap_extend=-0.5):
+		self.matrix_name = matrix_name
+		self.matrix = self.load_matrix()
+		self.seq1=" "+seq1[:]
+		self.seq2=" "+seq2[:]
+		self.gap_open=-gap_open
+		self.gap_extend=-gap_extend
+		self.match = match
+		self.mismatch = mismatch
+
+		#self.H=[]
+		#self.S=[]
+		#self.E=[]
+		#self.F=[]
+
+	def load_matrix(self):
+		matrix = []
+		if self.matrix_name:
+			script_dir = os.path.dirname(__file__)
+			rel_path ='matrices/'
+			matrix_file_path = rel_path + self.matrix_name
+			abs_file_path = os.path.join(script_dir, matrix_file_path)
+
+			f = open(abs_file_path, 'r')
+			lines = f.readlines()
+			f.close()
+			for line in lines:
+				if "#" not in line:
+					line=line.strip("\n")
+					matrix.append(line.split())
+
+			return matrix
 
 #if two inputs are matched, return match score, else return mismatch score
-def compare(m, n, match, mismatch):
-    if m == n:
-        return match
-    else:
-        return mismatch
+	def compare(self, m, n):
+		if self.matrix_name == "":
+			if m == n:
+				return self.match
+			else:
+				return self.mismatch
+		else:
+			index_a = self.matrix[0].index(m)
+			index_b = self.matrix[0].index(n)
+			return int(self.matrix[index_a+1][index_b+1])
 
 #seq 1: first sequence
 #seq 2: second sequence
 #match, mismatch: match score and mismatch score.
 #u, v: penalty score
-def biuld_matrix(seq1, seq2, match, mismatch, v, u):
-	a = len(seq1)
-	b = len(seq2)
-	#initiate main score matrix
-	S = np.zeros((a + 1, b + 1))
-	#initiate scoring matrix with no gap
-	H = np.zeros((a + 1, b + 1))
-	#initialize matrix that second sequence has gap
-	E = np.zeros((a + 1, b + 1))
-	#initialize matrix that first sequence has gap
-	F = np.zeros((a + 1, b + 1))
+	def biuld_matrix(self):
+		a = len(self.seq1)-1
+		b = len(self.seq2)-1
+		#initiate main score matrix
+		self.S = np.zeros((a + 1, b + 1))
+		#initiate scoring matrix with no gap
+		self.H = np.zeros((a + 1, b + 1))
+		#initialize matrix that second sequence has gap
+		self.E = np.zeros((a + 1, b + 1))
+		#initialize matrix that first sequence has gap
+		self.F = np.zeros((a + 1, b + 1))
+		#print(self.S)
 
-	#adding space before each sequence.
-	seq1 = " "+seq1[:]
-	seq2 = " "+seq2[:]
-
-
-	for i in range(1, b+1 if a>b else a+1):
-		for j in range(i, b+1):
-			H[i,j] = S[i-1,j-1]+compare(seq1[i],seq2[j],match,mismatch)
-			E[i,j] = max(np.add(S[0:i,j],-(np.arange(i,0,-1)*u+v)))
-			F[i,j] = max(np.add(S[i,0:j],-(np.arange(j,0,-1)*u+v)))
-			S[i,j] = max([0,H[i,j],E[i,j],F[i,j]])
-		for j in range(i+1, a+1):
-			H[j, i] = S[j-1, i-1]+compare(seq1[j], seq2[i],match,mismatch)
-			E[j, i] = max(np.add(S[0:j, i], -(np.arange(j,0,-1) * u + v)))
-			F[j, i] = max(np.add(S[j, 0:i], -(np.arange(i,0,-1) * u + v)))
-			S[j, i] = max([0, H[j, i], E[j, i], F[j, i]])
-
-	return S, H, E, F
-
-def traceback(seq1, seq2, v, u, S, i, j, S1, S2, t1, t2, H, E, F):
-	#print(t1, " ", t2, " ", i, " ", j)
-	if i == 1 and j == 1:
-		S1.append(seq1[1] + t1[:])
-		S2.append(seq2[1] + t2[:])
-		return
-	if S[i,j] == H[i,j]:
-		#print("first")
-		traceback(seq1, seq2, v, u, S, i - 1, j - 1, S1, S2, seq1[i] + t1[:], seq2[j] + t2[:], H, E, F)
-	if S[i,j] == E[i,j]:
-		step = np.add(S[0:i,j],-(np.arange(i,0,-1)*u+v))
-		step = list(step)
-		step = i-step.index(E[i, j])
-		#print("second", step, E[i,j])
-		traceback(seq1, seq2, v, u, S, i - step, j, S1, S2, seq1[i]+t1[:], "-"*step+t2[:], H, E, F)
-	if S[i,j] == F[i,j]:
-		step = np.add(S[i, 0:j], -(np.arange(j, 0, -1) * u + v))
-		step = list(step)
-		step = j - step.index(F[i, j])
-		#print("third", step)
-		traceback(seq1, seq2, v, u, S, i, j-step, S1, S2, "-"*step+t1[:], seq2[j]+t2[:], H, E, F)
+		#adding space before each sequence.
 
 
 
-S, H, E, F = biuld_matrix("CTATAATCCC", "CTGTATC", 1, -1, 1, 1)
+		for i in range(1, b+1 if a>b else a+1):
+			for j in range(i, b+1):
+				self.H[i,j] = self.S[i-1,j-1]+self.compare(self.seq1[i],self.seq2[j])
+				self.E[i,j] = max(np.add(self.S[0:i,j],-(np.arange(i,0,-1)*self.gap_extend+self.gap_open)))
+				self.F[i,j] = max(np.add(self.S[i,0:j],-(np.arange(j,0,-1)*self.gap_extend+self.gap_open)))
+				self.S[i,j] = max([0,self.H[i,j],self.E[i,j],self.F[i,j]])
+			for j in range(i+1, a+1):
+				self.H[j, i] = self.S[j-1, i-1]+self.compare(self.seq1[j], self.seq2[i])
+				self.E[j, i] = max(np.add(self.S[0:j, i], -(np.arange(j,0,-1) * self.gap_extend + self.gap_open)))
+				self.F[j, i] = max(np.add(self.S[j, 0:i], -(np.arange(i,0,-1) * self.gap_extend + self.gap_open)))
+				self.S[j, i] = max([0, self.H[j, i], self.E[j, i], self.F[j, i]])
+
+	
+
+	def traceback(self, i, j, S1, S2, t1, t2):
+		#print(t1, " ", t2, " ", i, " ", j)
+		if i == 1 and j == 1:
+			S1.append(self.seq1[1] + t1[:])
+			S2.append(self.seq2[1] + t2[:])
+			return
+		if self.S[i,j] == self.H[i,j]:
+			#print("first")
+			self.traceback(i - 1, j - 1, S1, S2, self.seq1[i]+t1[:], self.seq2[j]+t2[:])
+		if self.S[i,j] == self.E[i,j]:
+			step = np.add(self.S[0:i,j],-(np.arange(i,0,-1)*self.gap_extend+self.gap_open))
+			step = list(step)
+			step = i-step.index(self.E[i, j])
+			#print("second", step, self.E[i,j])
+			self.traceback(i - step, j, S1, S2, self.seq1[i]+t1[:], "-"*step+t2[:])
+		if self.S[i,j] == self.F[i,j]:
+			step = np.add(self.S[i, 0:j], -(np.arange(j, 0, -1)*self.gap_extend + self.gap_open))
+			step = list(step)
+			step = j - step.index(self.F[i, j])
+			#print("third", step)
+			self.traceback( i, j-step, S1, S2, "-"*step+t1[:], self.seq2[j]+t2[:])
+
+
+
+
+seq1 = SeqIO.read("example_fasta_files/homo_sapiens_lactate.fasta", "fasta")
+seq2 = SeqIO.read("example_fasta_files/mus_musculus_lactate.fasta", "fasta")
+a_str = str(seq1.seq)
+b_str = str(seq2.seq)
+SW = smith_waterman(seq1=seq1, seq2=seq2, matrix_name="BLOSUM62")
+#print(SW.matrix)
+SW.biuld_matrix()
+R = np.where(SW.S == np.max(SW.S))
+t1 = ""
+t2 = ""
+S1 = []
+S2 = []
+for i, j in zip(R[0],R[1]):
+	
+	SW.traceback(int(i), int(j), S1, S2, t1, t2)
+
+
+print(S1)
+print(S2)
+#R = np.where(SW.S == np.max(SW.S))
 
 #print("S = ",np.around(S,2))
 #print("H = ",np.around(H,2))
 #print("E = ",np.around(E,2))
 #print("F = ",np.around(F,2))
  
-S1 = []
+'''S1 = []
 S2 = []
 t1 = ""
 t2 = ""
+a_str = " "+a_str[:]
+b_str = " "+b_str[:]
 R = np.where(S == np.max(S))
 for x, y in zip(R[0],R[1]):
-    traceback(" CTATAATCCC", " CTGTATC", 1, 1, S, x, y, S1, S2, t1, t2, H, E, F)
+    traceback(a_str, b_str, 1, 1/3, S, x, y, S1, S2, t1, t2, H, E, F)
 print(S1)
-print(S2)
+print(S2)'''
 
