@@ -11,6 +11,7 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
 import os
+from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
 
 print(os.getcwd())
 #todo: make a plots page
@@ -20,14 +21,27 @@ rel_path = 'human_v_mus.fasta'
 abs_file_path = os.path.join(script_dir, rel_path)
 print(f'abs_file_path: {abs_file_path}')
 file = 'human_v_mus.fasta'
-data = open(abs_file_path).read()
-plots_page = html.Div([
-    dashbio.AlignmentChart(
-        id='testchart',
-        data=data,
-        colorscale='hydro',
-        conservationcolorscale='blackbody',
-        tilewidth=50
-    ),
-    html.Div(id='alignment-output')
+#data = open(abs_file_path).read()
+
+plots_page = dbc.Container([
+    dbc.Row([
+        dbc.Col([
+            html.H3("Demo of Dash Bio Alignment"),
+            html.P(
+                "Alignment of Homo sapiens lactate protein "
+                "with Mus musculus lactate protein "
+                "from lab or assignment"
+            ),
+            dbc.Button(
+                'Show Alignment Chart',
+                id='btn-align-chart',
+                color="primary",
+                n_clicks=0
+            ),
+            html.Div(
+                id="alignment-viewer-output"
+            )
+        ], width=12)
+    ])
 ])
+

@@ -55,6 +55,7 @@ class smith_waterman():
 #seq 2: second sequence
 #match, mismatch: match score and mismatch score.
 #u, v: penalty score
+
 	def biuld_matrix(self):
 		a = len(self.seq1)-1
 		b = len(self.seq2)-1
@@ -113,6 +114,7 @@ class smith_waterman():
 
 seq1 = SeqIO.read("example_fasta_files/homo_sapiens_lactate.fasta", "fasta")
 seq2 = SeqIO.read("example_fasta_files/mus_musculus_lactate.fasta", "fasta")
+
 a_str = str(seq1.seq)
 b_str = str(seq2.seq)
 SW = smith_waterman(seq1=seq1, seq2=seq2, matrix_name="BLOSUM62")
@@ -132,6 +134,9 @@ print(S1)
 print(S2)
 #R = np.where(SW.S == np.max(SW.S))
 
+# cast to string
+
+
 #print("S = ",np.around(S,2))
 #print("H = ",np.around(H,2))
 #print("E = ",np.around(E,2))
@@ -144,8 +149,17 @@ t2 = ""
 a_str = " "+a_str[:]
 b_str = " "+b_str[:]
 R = np.where(S == np.max(S))
+
+#demo strings
+#a= " CTATAATCCC"
+#b= " CTGTATC"
+
 for x, y in zip(R[0],R[1]):
+<<<<<<< HEAD
     traceback(a_str, b_str, 1, 1/3, S, x, y, S1, S2, t1, t2, H, E, F)
+=======
+    traceback(a_str, b_str, 1, 1, S, x, y, S1, S2, t1, t2, H, E, F)
+>>>>>>> 5a4f9c91ddf568b299b719f41229632011944dca
 print(S1)
 print(S2)'''
 

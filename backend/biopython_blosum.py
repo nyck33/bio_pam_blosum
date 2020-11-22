@@ -28,6 +28,8 @@ https://github.com/biopython/biopython/tree/master/Bio/Align/substitution_matric
 from Bio import pairwise2
 from Bio import SeqIO
 from Bio.Align import substitution_matrices
+
+
 matrix=substitution_matrices.load("BLOSUM62")
 seq1 = SeqIO.read("example_fasta_files/homo_sapiens_lactate.fasta", "fasta")
 seq2 = SeqIO.read("example_fasta_files/mus_musculus_lactate.fasta", "fasta")
@@ -37,8 +39,21 @@ match = 2
 mismatch = -1
 gap_open = -10
 gap_extend = -0.5
-alignments = pairwise2.align.globalds(seq1.seq, seq2.seq, matrix, 
+alignments = pairwise2.align.globalds(seq1.seq, seq2.seq, matrix,
                         gap_open, gap_extend)
+
+# check types of named tuples in list alignments
+alignA = alignments[0]
+seqA = alignA.seqA
+seqB = alignA.seqB
+score = alignA.score
+start = alignA.start
+end = alignA.end
+
+print(type(seqA), type(seqB), type(score), type(start), type(end))
+print(seqA, seqB)
+print(score, start,end)
+
 print(type(alignments))
 print(len(alignments))
 
@@ -48,13 +63,16 @@ print(f'x:{x}')
 
 ###################################
 #local alignment
+"""
 print("local\n")
 gap_extend = -1
 
-alignments = pairwise2.align.localds(seq1, seq2, matrix, gap_open, gap_extend )
+alignments = pairwise2.align.localds(seq1.seq, seq2.seq, matrix, gap_open, gap_extend)
 
 print(f'local len: {len(alignments)}')
 
 y = pairwise2.format_alignment(*alignments[0], full_sequences=True)
 
 print(f'y:\n{y}')
+
+"""
