@@ -29,7 +29,7 @@ from frontend.needleman_layouts.visual_layout import plots_page
 
 #import register_callbacks
 from frontend.needleman_callbacks.entrez_callbacks import register_entrez_callbacks
-
+from frontend.needleman_callbacks.visual_callbacks import register_visual_callbacks
 #import ncbi search class
 from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
 from Bio import Entrez
@@ -47,7 +47,7 @@ handle = Entrez.einfo(db='protein')
 # see all available db's
 
 #todo: backend import
-from backend.pam import main, trace_back, build_matrics, load, parse_name, compare
+#from backend.pam import main, trace_back, build_matrics, load, parse_name, compare
 
 #register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
@@ -58,6 +58,7 @@ app.title = "Needleman Wunsch and NCBI"
 #######################################################################
 #register callbacks
 register_entrez_callbacks(app)
+register_visual_callbacks(app)
 ###############################################################
 SIDEBAR_STYLE={
     "position": "fixed",
@@ -97,7 +98,22 @@ sidebar = html.Div(
 )
 ##############################################################
 # todo: no fixed content
-content = html.Div(id="page-content", style=CONTENT_STYLE)
+content = dbc.Container([
+    dbc.Row([
+        dbc.Col([
+            dcc.Store(
+                id="accession-store-1"
+            ),
+            dcc.Store(
+                id="accession-store-2"
+            ),
+            html.Div(
+                id="page-content",
+                style=CONTENT_STYLE
+            )
+        ], width=12)
+    ])
+])
 
 app.layout=html.Div([dcc.Location(id="url"), sidebar, content])
 
@@ -116,7 +132,7 @@ def toggle_active_links(pathname):
         return True, False, False
     elif pathname == "/entrez-parameters":
         return False, True, False
-    else:  #todo: need error pages when url pathname entry is not a match
+    else:
         return False, False, True
 
 @app.callback(Output("page-content", "children"),

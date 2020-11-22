@@ -40,6 +40,7 @@ entrez_page = dbc.Container([
                 "check store 2",
                 id="check-store-2"
             ),
+
             html.Div(
                 "context checker",
                 id='ctx-check'

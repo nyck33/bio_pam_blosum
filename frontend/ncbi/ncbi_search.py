@@ -40,8 +40,31 @@ def get_fasta_by_accession(accession, full_fasta=False):
     """
     fasta_handle = Entrez.efetch("protein", id=accession, rettype='fasta', retmode='text' )
     rec_fasta = SeqIO.read(fasta_handle, "fasta")
+    '''
     if full_fasta:
-        return fasta_handle.read()
+        fasta_file = fasta_handle.read()
+        return fasta_file
+    '''
     seq_str = str(rec_fasta.seq)
+    fasta_file_str = ">"
+    if full_fasta:
+        line_len = 50
+        fasta_file_str += rec_fasta.description
+        fasta_file_str += "\n"
+        # while remaining chars, slice into lengths of 50
+        len_seq = len(seq_str)
+        num_slices = int(len_seq / line_len)
+        seq_copy = seq_str
+        for i in range(num_slices):
+            fasta_file_str += seq_str[(line_len*i): (line_len*(i+1))]
+            fasta_file_str += "\n"
+        # last remaining bits
+        if seq_str[(line_len*num_slices):]:
+            fasta_file_str+=seq_str[(line_len*num_slices):]
+        fasta_file_str +="\n"
+
+        #fasta_file_str += str(rec_fasta.seq)
+        return fasta_file_str
+
     return seq_str
 

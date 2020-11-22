@@ -23,7 +23,6 @@ from Bio.Align import substitution_matrices
 
 #import ncbi search class
 from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
-from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
 from backend.pam import main, trace_back, build_matrics, load, parse_name, compare
 #import needleman
 from backend.bio_needleman import Needleman
@@ -70,6 +69,8 @@ def register_entrez_callbacks(app):
     @app.callback(
         [Output('sequence-1-store', 'data'),
          Output('sequence-2-store', 'data'),
+         Output('accession-store-1', 'data'),
+         Output('accession-store-2', 'data'),
          Output('ctx-check', 'children'),
          Output('debug-out', 'children')],
         [Input('btn-acc-1', 'n_clicks'), #for top accession input
@@ -91,7 +92,7 @@ def register_entrez_callbacks(app):
                      upload_name2, upload_date2, txt_input1, txt_input2):
         if btn_acc<=0 and btn_acc2<=0 and upload_contents is None and upload_contents2 is None\
                 and btn_txt<=0 and btn_txt2<=0:
-            return no_update, no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update, no_update, no_update
 
         ctx = callback_context
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]
@@ -105,34 +106,49 @@ def register_entrez_callbacks(app):
         if trigger == "btn-acc-1":
             # calls search_fasta_by_accession()
             seq_str, seq_json = search_accession(acc_input)
-            return seq_json, no_update, ctx_msg, seq_str
+            #jsonify acc_input
+            acc_json = json.dumps(acc_input)
+            return seq_json, no_update, acc_json, no_update, \
+                    ctx_msg, seq_str
         elif trigger == "btn-acc-2":
             seq_str, seq_json = search_accession(acc_input2)
-            return no_update, seq_json, ctx_msg, seq_str
+            # jsonify acc_input
+            acc2_json = json.dumps(acc_input2)
+            return no_update, seq_json, no_update, acc2_json, \
+                    ctx_msg, seq_str
 
         #upload inputs
         elif trigger == "upload-data":
-            seq_json, html_output = process_upload(upload_contents,
+            seq_json, html_output, acc_num = process_upload(upload_contents,
                                                       upload_name,
                                                    upload_date)
             # make a string
             seq_str = json.loads(seq_json)
-            return seq_json, no_update, ctx_msg, html_output
+            # jsonify acc_num
+            acc_json = json.dumps(acc_num)
+            return seq_json, no_update, acc_json, no_update, \
+                    ctx_msg, html_output
         elif trigger == "upload-data-two":
-            seq_json, html_output = process_upload(upload_contents2,
+            seq_json, html_output, acc_num = process_upload(upload_contents2,
                                                    upload_name2,
                                                    upload_date2)
             # make a string
             seq_str = json.loads(seq_json)
-            return no_update, seq_json, ctx_msg, html_output
+            # jsonify acc_num
+            acc_json = json.dumps(acc_num)
+
+            return no_update, seq_json, no_update, acc_json,\
+                   ctx_msg, html_output
         #accepts seq part of fasta only, update store
         elif trigger == "btn-text-1":
             # store 1, store2, ctx, debug-out
             seq_json = json.dumps(txt_input1)
-            return seq_json, no_update, ctx_msg, no_update
+            return seq_json, no_update, no_update, no_update, \
+                   ctx_msg, no_update
         elif trigger == "btn-text-2":
             seq_json = json.dumps(txt_input2)
-            return no_update, seq_json, ctx_msg, no_update
+            return no_update, seq_json, no_update, no_update,\
+                   ctx_msg, no_update
 
     ##############################################
     # helpers
@@ -141,14 +157,11 @@ def register_entrez_callbacks(app):
             return no_update
         # print(f"listContents: {type(contents)}\n{len(contents)}")
 
-        for i in range(len(contents)):
-            print(i, type(contents[i]), contents[i])
-        # print(f"listFilename: {type(names)}\n{len(names)}")
-        # print(f"listModified: {type(dates)}\n{len(dates)}")
-        if contents is not None:
-            seq_json, Pre_output = parse_contents(contents, names, dates)
 
-            return seq_json, Pre_output
+        if contents is not None:
+            seq_json, Pre_output, acc_num = parse_contents(contents, names, dates)
+
+            return seq_json, Pre_output, acc_num
 
 
     # helpers for process upload()
@@ -156,27 +169,32 @@ def register_entrez_callbacks(app):
     def parse_contents(contents, filename, date):
         contents = contents.replace('\n', '')
         content_type, content_string, = contents.split(',')
-        print(f'name:{type(filename)}\n{filename}\n')
-        print(f'type:{type(content_type)}\n{content_type}\n')
-        print(f'string:{type(content_string)}\n{content_string}\n')
+        #print(f'name:{type(filename)}\n{filename}\n')
+        #print(f'type:{type(content_type)}\n{content_type}\n')
+        #print(f'string:{type(content_string)}\n{content_string}\n')
         decoded = decode_file_content(content_string)
-        print(f'decoded:\n{decoded}\n')
+        #print(f'decoded:\n{decoded}\n')
         # get substring from line 2
         decoded_arr = decoded.split()
         seq = ""
+        acc_num = ""
         for line in decoded_arr:
+            if line[0] == ">":
+                acc_num = line.split()[0]
+                acc_num = acc_num.replace(">", "")
+                print(f'acc_num: {acc_num}')
             if len(line) > 10 and line.upper() == line and line.isalpha():
                 seq += line
 
         assert seq.isalpha()
-        print(seq)
-        print(len(seq))
+        #print(seq)
+        #print(len(seq))
         seq_json = json.dumps(seq)
 
         Pre_output = html.Div([
             html.H5(filename),
             html.H6(datetime.datetime.fromtimestamp(date)),
-
+            html.P(f"accession: {acc_num}"),
             html.Div([
                 html.P(decoded)
             ]),
@@ -192,7 +210,7 @@ def register_entrez_callbacks(app):
 
         ])
 
-        return seq_json, Pre_output
+        return seq_json, Pre_output, acc_num
 
 
     # annotations (param: param type) -> return type
@@ -305,7 +323,7 @@ def register_entrez_callbacks(app):
         for i in range(len(alignments)):
             align_str = pairwise2.format_alignment(*alignments[i])
             align_str_arr.append(align_str)
-        print(f'align_str:\n{align_str_arr[0]}')
+        #print(f'align_str:\n{align_str_arr[0]}')
         alignments_html = html.Div([
             html.P(
                 align_str_arr[i]
