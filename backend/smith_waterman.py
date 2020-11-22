@@ -9,6 +9,7 @@ class smith_waterman():
 	def __init__(self, seq1, seq2, matrix_name="", match=2, mismatch=-3, gap_open=-10, gap_extend=-0.5):
 		self.matrix_name = matrix_name
 		self.matrix = self.load_matrix()
+		#add space before each sequence
 		self.seq1=" "+seq1[:]
 		self.seq2=" "+seq2[:]
 		self.gap_open=-gap_open
@@ -21,6 +22,7 @@ class smith_waterman():
 		#self.E=[]
 		#self.F=[]
 
+	#Load the subsititution matrix to the self.matrix
 	def load_matrix(self):
 		matrix = []
 		if self.matrix_name:
@@ -39,7 +41,7 @@ class smith_waterman():
 
 			return matrix
 
-#if two inputs are matched, return match score, else return mismatch score
+	#if two inputs are matched, return match score, else return mismatch score
 	def compare(self, m, n):
 		if self.matrix_name == "":
 			if m == n:
@@ -51,10 +53,7 @@ class smith_waterman():
 			index_b = self.matrix[0].index(n)
 			return int(self.matrix[index_a+1][index_b+1])
 
-#seq 1: first sequence
-#seq 2: second sequence
-#match, mismatch: match score and mismatch score.
-#u, v: penalty score
+
 
 	def biuld_matrix(self):
 		a = len(self.seq1)-1
@@ -75,9 +74,13 @@ class smith_waterman():
 
 		for i in range(1, b+1 if a>b else a+1):
 			for j in range(i, b+1):
+				#H stores score that two input is a match
 				self.H[i,j] = self.S[i-1,j-1]+self.compare(self.seq1[i],self.seq2[j])
+				#E stores score that one sequence has gap
 				self.E[i,j] = max(np.add(self.S[0:i,j],-(np.arange(i,0,-1)*self.gap_extend+self.gap_open)))
+				#E stores score that another sequence has gap
 				self.F[i,j] = max(np.add(self.S[i,0:j],-(np.arange(j,0,-1)*self.gap_extend+self.gap_open)))
+				#set the highest score for current position, if lowest score is negative, set to 0
 				self.S[i,j] = max([0,self.H[i,j],self.E[i,j],self.F[i,j]])
 			for j in range(i+1, a+1):
 				self.H[j, i] = self.S[j-1, i-1]+self.compare(self.seq1[j], self.seq2[i])
@@ -89,24 +92,25 @@ class smith_waterman():
 
 	def traceback(self, i, j, S1, S2, t1, t2):
 		#print(t1, " ", t2, " ", i, " ", j)
+		#if it go back to start, append the sequence
 		if i == 1 and j == 1:
 			S1.append(self.seq1[1] + t1[:])
 			S2.append(self.seq2[1] + t2[:])
 			return
+		#if the current score is from no gap scoring matrix
+		#go back diagonoly
 		if self.S[i,j] == self.H[i,j]:
-			#print("first")
 			self.traceback(i - 1, j - 1, S1, S2, self.seq1[i]+t1[:], self.seq2[j]+t2[:])
+		#else go up or left
 		if self.S[i,j] == self.E[i,j]:
 			step = np.add(self.S[0:i,j],-(np.arange(i,0,-1)*self.gap_extend+self.gap_open))
 			step = list(step)
 			step = i-step.index(self.E[i, j])
-			#print("second", step, self.E[i,j])
 			self.traceback(i - step, j, S1, S2, self.seq1[i]+t1[:], "-"*step+t2[:])
 		if self.S[i,j] == self.F[i,j]:
 			step = np.add(self.S[i, 0:j], -(np.arange(j, 0, -1)*self.gap_extend + self.gap_open))
 			step = list(step)
 			step = j - step.index(self.F[i, j])
-			#print("third", step)
 			self.traceback( i, j-step, S1, S2, "-"*step+t1[:], self.seq2[j]+t2[:])
 
 
