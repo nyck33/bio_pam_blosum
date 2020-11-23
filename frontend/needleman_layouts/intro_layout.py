@@ -13,7 +13,7 @@ from dash.dependencies import Input, Output, State # Load Data
 
 
 needleman_intro = dbc.Container([
-    html.H2("Needleman-Wunsch, Smith-Waterman and NCBI API Calls",
+    html.H2("Needleman-Wunsch, Smith-Waterman and Entrez",
             id="title-intro",
             style={
                 'text-align': 'center'
@@ -46,8 +46,8 @@ needleman_intro = dbc.Container([
             dbc.Col([
                 html.P("Written in Python using Plotly Dash"),
                 html.P(
-                    "By Fei Xiang (dynamic programming algorithms) " 
-                    "and Nobutaka Kim (frontend, NCBI API, BioPython backup engine)"
+                    "By Nobutaka Kim using Plotly Dash, NCBI API's "
+                    "and BioPython"
                 )
 
             ], width=12)

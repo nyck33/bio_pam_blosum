@@ -23,7 +23,6 @@ from Bio.Align import substitution_matrices
 
 #import ncbi search class
 from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
-from backend.pam import main, trace_back, build_matrics, load, parse_name, compare
 #import needleman
 from backend.bio_needleman import Needleman
 
@@ -153,11 +152,6 @@ def register_entrez_callbacks(app):
     ##############################################
     # helpers
     def process_upload(contents, names, dates):
-        if not contents and not names and not dates:
-            return no_update
-        # print(f"listContents: {type(contents)}\n{len(contents)}")
-
-
         if contents is not None:
             seq_json, Pre_output, acc_num = parse_contents(contents, names, dates)
 
@@ -169,11 +163,8 @@ def register_entrez_callbacks(app):
     def parse_contents(contents, filename, date):
         contents = contents.replace('\n', '')
         content_type, content_string, = contents.split(',')
-        #print(f'name:{type(filename)}\n{filename}\n')
-        #print(f'type:{type(content_type)}\n{content_type}\n')
-        #print(f'string:{type(content_string)}\n{content_string}\n')
+
         decoded = decode_file_content(content_string)
-        #print(f'decoded:\n{decoded}\n')
         # get substring from line 2
         decoded_arr = decoded.split()
         seq = ""
@@ -187,8 +178,6 @@ def register_entrez_callbacks(app):
                 seq += line
 
         assert seq.isalpha()
-        #print(seq)
-        #print(len(seq))
         seq_json = json.dumps(seq)
 
         Pre_output = html.Div([
@@ -223,6 +212,7 @@ def register_entrez_callbacks(app):
         :return:
         results: decoded str
         """
+        #todo: might need "UTF-8" in decode()
         return base64.b64decode(file.split(',')[-1].encode('ascii')).decode()
 
     #helper 2
@@ -265,13 +255,56 @@ def register_entrez_callbacks(app):
                         for i in range(len(accessions_arr))])
 
         return acc_arr_links, query_translation
+#########################################################
+    #get GenBank info
+    @app.callback(
+        [Output('gb-output', 'children'),
+         Output('gb2-output', 'children')],
+        [Input('btn-get-gb', 'n_clicks'),
+         Input('btn-get-gb2', 'n_clicks')],
+        [State('accession-store-1', 'data'),
+         State('accession-store-2', 'data')]
+    )
+    def get_gb_info(btn1, btn2, acc1_json, acc2_json):
+        if btn1<=0 and btn2<=0:
+            return no_update, no_update
+        ctx = callback_context
+        trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+        ctx_msg = json.dumps({
+            'states': ctx.states,
+            'triggered': ctx.triggered,
+            'inputs': ctx.inputs
+        }, indent=2)
+
+        if trigger=="btn-get-gb":
+            acc1 = json.loads(acc1_json)
+            gb1_str = get_full_GB_info(acc1)
+
+            gb_html = html.P(
+                gb1_str,
+                style={
+                    'word-wrap': 'break-word'
+                }
+            )
+            return gb_html, no_update
+        elif trigger=="btn-get-gb2":
+            acc2 = json.loads(acc2_json)
+            gb2_str = get_full_GB_info(acc2)
+
+            gb2_html = html.P(
+                gb2_str,
+
+            )
+            return no_update, gb2_html
+
 
 ################################################################################################################################
 # run needle and waterman
     @app.callback(
-        [Output('needleman-output', 'children'),
-         Output('needleman-output-2', 'children'),
-       Output('waterman-output', 'children'),
+        [Output('aligned-A', 'data'),
+         Output('aligned-B', 'data'),
+        Output('needleman-output', 'children'),
+         Output('waterman-output', 'children'),
        Output('needle-water-ctx', 'children')],
       [Input('run-needleman', 'n_clicks'),
        Input('run-waterman', 'n_clicks')],
@@ -283,7 +316,8 @@ def register_entrez_callbacks(app):
     def run_needleman(btn_needle, btn_waterman, seq1_json, seq2_json,
                         gap_open, gap_extend, mat_name):
         if btn_needle <=0 and btn_waterman <=0:
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update,\
+                        no_update
 
         ctx = callback_context
         trigger = ctx.triggered[0]['prop_id'].split('.')[0]
@@ -304,15 +338,31 @@ def register_entrez_callbacks(app):
             needle.align_global()
             # get list of named tuples
             alignments = needle.alignments
+            # get the sequences from the first alignment and store
+            # for chart
+            aligned_seq1 = alignments[0].seqA
+            aligned_seq2 = alignments[0].seqB
+            #jsonify
+            aligned1_json = json.dumps(aligned_seq1)
+            aligned2_json = json.dumps(aligned_seq2)
+
             alignments_html = format_output(alignments)
-            new_html = reformat_output(alignments)
-            return alignments_html, no_update, ctx_msg
+            return aligned1_json, aligned2_json, alignments_html, no_update,  ctx_msg
 
         if trigger=="run-waterman":
             needle.align_local()
             alignments = needle.alignments
+
+            # get the sequences from the first alignment and store
+            # for chart
+            aligned_seq1 = alignments[0].seqA
+            aligned_seq2 = alignments[0].seqB
+            # jsonify
+            aligned1_json = json.dumps(aligned_seq1)
+            aligned2_json = json.dumps(aligned_seq2)
+
             alignments_html = format_output(alignments)
-            return no_update, alignments_html, ctx_msg
+            return aligned1_json, aligned2_json, no_update, alignments_html, ctx_msg
 
     def format_output(alignments):
         """
@@ -338,29 +388,32 @@ def register_entrez_callbacks(app):
 
         return alignments_html
 
-    def reformat_output(alignments_arr):
-        """
-        Just return one
-        :param alignments_arr:
-        :return:
-        """
-        alignment = alignments_arr[0]
-        seqA = str(alignment.seqA)
-        seqB = str(alignment.seqB)
+    @app.callback(
+        [Output('aligned-A-output', 'children'),
+        Output('aligned-B-output', 'children')],
+        [Input('aligned-A', 'data'),
+         Input('aligned-B', 'data')]
+    )
+    def show_aligned_seqs(a_json, b_json):
+        a_str = json.loads(a_json)
+        b_str = json.loads(b_json)
 
-        # break into 50 characters into array
-        lenA = len(seqA)
-        lenB = len(seqB)
-        '''
-        arrA = split seqA by 50
-        arrB
-        alignments_html = html.Div([
+        alignA_html = html.Div([
             html.P(
-                f'{arrA[i]}\n{arrB[i]}',
+                f'A aligned\n{a_str}',
                 style={
                     'word-wrap': 'break-word'
                 }
-            ) for i in range(len(align_str_arr))
+            )
         ])
-        '''
-        pass
+
+        alignB_html = html.Div([
+            html.P(
+                f'B aligned\n{b_str}',
+                style={
+                    'word-wrap': 'break-word'
+                }
+            )
+        ])
+
+        return alignA_html, alignB_html

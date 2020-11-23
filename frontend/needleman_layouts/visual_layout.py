@@ -1,4 +1,4 @@
-import dash_bio as dashbio
+import dash_bio
 import six.moves.urllib.request as urlreq
 from six import PY3
 import dash_html_components as html
@@ -20,30 +20,54 @@ print(f'scriptdir: {script_dir}')
 rel_path = 'human_v_mus.fasta'
 abs_file_path = os.path.join(script_dir, rel_path)
 print(f'abs_file_path: {abs_file_path}')
-file = 'human_v_mus.fasta'
-#data = open(abs_file_path).read()
 
-#todo: cheating with global
-file_path = ""
+data = open(abs_file_path).read()
+
 
 plots_page = dbc.Container([
     dbc.Row([
         dbc.Col([
-            html.H3("Demo of Dash Bio Alignment"),
+            dcc.Store(
+                id="aligned-fasta-store"
+            ),
+            html.Div(
+                id="aligned-fasta-output"
+            ),
+            html.H3("Alignment Chart"),
             html.P(
-                "Alignment of Homo sapiens lactate protein "
-                "with Mus musculus lactate protein "
-                "from lab or assignment"
+                "Input: alignment FASTA file "
+                "click link for example: "
+            ),
+            html.A(
+                "Alignment FASTA example",
+                href="https://github.com/plotly/dash-bio/blob/master/tests/dashbio_demos/dash-alignment-chart/data/sample.fasta",
+                target="_blank"
             ),
             dbc.Button(
-                'Show Alignment Chart',
+                'Update Alignment Chart',
                 id='btn-align-chart',
                 color="primary",
                 n_clicks=0
             ),
-            html.Div(
-                id="alignment-viewer-output"
-            )
+            html.Div([
+                dash_bio.AlignmentChart(
+                    id='my-alignment-viewer',
+                    data = data
+                ),
+                html.Div(
+                    id="alignment-viewer-output"
+                )
+            ]),
+            html.Div([
+                dash_bio.AlignmentChart(
+                    id='my-alignment-viewer-json',
+                    data = data #default
+                ),
+                html.Div(
+                    id="alignment-viewer-output-json"
+                )
+            ])
+
         ], width=12)
     ])
 ])

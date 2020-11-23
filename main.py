@@ -25,7 +25,7 @@ from Bio.Align import substitution_matrices
 #import layouts
 from frontend.needleman_layouts.entrez_layout import entrez_page, matrix_names_arr
 from frontend.needleman_layouts.intro_layout import needleman_intro
-from frontend.needleman_layouts.visual_layout import plots_page
+from frontend.needleman_layouts.visual_layout import plots_page, abs_file_path
 
 #import register_callbacks
 from frontend.needleman_callbacks.entrez_callbacks import register_entrez_callbacks
@@ -110,6 +110,18 @@ content = dbc.Container([
             dcc.Store(
                 id="accession-store-2"
             ),
+            dcc.Store(
+                id="aligned-A"
+            ),
+            dcc.Store(
+                id="aligned-B"
+            ),
+            html.Div(
+                id='aligned-A-output'
+            ),
+            html.Div(
+                id='aligned-B-output'
+            ),
             html.Div(
                 id="page-content",
                 style=CONTENT_STYLE
@@ -165,5 +177,5 @@ def render_page_content(pathname):
 #####################################################################################
 
 if __name__=="__main__":
-    #app.run_server(debug=True, port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
-    app.run_server
+    app.run_server(debug=True, port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
+    #app.run_server

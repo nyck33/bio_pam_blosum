@@ -123,18 +123,24 @@ entrez_page = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.Label("NCBI Search by Text Results appear here"),
-            html.Div(
-                # full fasta for accession num input
-                id="ncbi-textsearch-res"
+            dcc.Loading(
+                id='ncbi-textsearch-loading',
+                children=[
+                    html.Div(
+                        # full fasta for accession num input
+                        id="ncbi-textsearch-res"
+                    )],
+                    type="dot"
             ),
             html.Br(),
-            html.Div(
-                "query translation output",
-                id="query-translation-output"
-            ),
-            html.Div(
-                "full GB output",
-                id="gb=output"
+            dcc.Loading(
+                id='query-translation-loading',
+                children=[
+                    html.Div(
+                        "query translation output",
+                        id="query-translation-output"
+                    )],
+                    type="graph"
             )
         ], width=12)
     ]),
@@ -230,6 +236,42 @@ entrez_page = dbc.Container([
         ], width=6)
     ]),
     html.Hr(),
+    dbc.Row([
+        dbc.Col([
+            dbc.Button(
+                'Get Genbank Info Seq1',
+                id='btn-get-gb',
+                color="primary",
+                n_clicks=0
+            ),
+            html.Br(),
+            dcc.Loading(
+                id='genbank-info-loading',
+                children=[
+                    html.Div(
+                        id="gb-output"
+                    )],
+                    type="dot"
+            ),
+            html.Br(),
+            dbc.Button(
+                'Get Genbank Info Seq2',
+                id='btn-get-gb2',
+                color="primary",
+                n_clicks=0
+            ),
+            html.Br(),
+            dcc.Loading(
+                id='genbank2-info-loading',
+                children=[
+                    html.Div(
+                        id="gb2-output"
+                    )],
+                    type="default"
+            ),
+        ])
+    ]),
+    html.Hr(),
     #Let’s say match is 1-10 mismatch is -1 to -10. Gap penalty is -1 to -10 as well
     dbc.Row([
         dbc.Col([
@@ -315,16 +357,15 @@ entrez_page = dbc.Container([
         ], width=12),
         dbc.Col([
             html.H3("Global Alignments"),
-            html.Div(
-                id="needleman-output"
+            dcc.Loading(
+                id='needleman-loading',
+                children=[
+                    html.Div(
+                        id="needleman-output"
+                    )],
+                    type="circle"
             )
         ], width=12),
-        dbc.Col([
-            html.H3("Global Redone"),
-            html.Div(
-                id="needleman-output-2"
-            )
-        ], width=12)
     ]),
     dbc.Row([
         dbc.Col([
@@ -335,8 +376,13 @@ entrez_page = dbc.Container([
         ], width=12),
         dbc.Col([
             html.H3("Local Alignments"),
-            html.Div(
-                id="waterman-output"
+            dcc.Loading(
+                id='waterman-loading',
+                children=[
+                    html.Div(
+                        id="waterman-output"
+                    )],
+                type="cube"
             )
         ], width=12),
         dbc.Col([
