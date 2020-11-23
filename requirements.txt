@@ -1,18 +1,18 @@
 ansi2html==1.5.2
-appdirs==1.4.4
-argon2-cffi @ file:///tmp/build/80754af9/argon2-cffi_1596828493937/work
+appdirs
+argon2-cffi
 arrow==0.17.0
 async-generator==1.10
-attrs @ file:///tmp/build/80754af9/attrs_1600298409949/work
+attrs
 backcall==0.2.0
 bcrypt==3.1.7
 biopython==1.78
-bleach @ file:///tmp/build/80754af9/bleach_1600439572647/work
+bleach
 Brotli==1.0.9
 cairocffi==1.2.0
 CairoSVG==2.5.0
 certifi==2020.6.20
-cffi @ file:///tmp/build/80754af9/cffi_1600699146221/work
+cffi
 chardet==3.0.4
 click==7.1.2
 cssselect2==0.4.1
@@ -41,33 +41,33 @@ httpcore==0.9.1
 httpx==0.13.3
 hyperframe==5.2.0
 idna==2.10
-importlib-metadata @ file:///tmp/build/80754af9/importlib-metadata_1602276842396/work
-ipykernel @ file:///tmp/build/80754af9/ipykernel_1596207638929/work/dist/ipykernel-5.3.4-py3-none-any.whl
-ipython @ file:///tmp/build/80754af9/ipython_1604101197014/work
+importlib-metadata
+ipykernel
+ipython
 ipython-genutils==0.2.0
-ipywidgets @ file:///tmp/build/80754af9/ipywidgets_1601490159889/work
+ipywidgets
 itsdangerous==1.1.0
-jedi @ file:///tmp/build/80754af9/jedi_1598371611696/work
+jedi
 Jinja2==2.11.2
 joblib==0.17.0
 json5==0.9.5
-jsonschema @ file:///tmp/build/80754af9/jsonschema_1602607155483/work
+jsonschema
 jupyter==1.0.0
-jupyter-client @ file:///tmp/build/80754af9/jupyter_client_1601311786391/work
-jupyter-console @ file:///tmp/build/80754af9/jupyter_console_1598884538475/work
+jupyter-client
+jupyter-console
 jupyter-core==4.6.3
 jupyter-dash==0.3.1
 jupyterlab==2.2.9
-jupyterlab-pygments @ file:///tmp/build/80754af9/jupyterlab_pygments_1601490720602/work
+jupyterlab-pygments
 jupyterlab-server==1.2.0
 kiwisolver==1.2.0
 MarkupSafe==1.1.1
 matplotlib==3.3.2
 mistune==0.8.4
 multipledispatch==0.6.0
-nbclient @ file:///tmp/build/80754af9/nbclient_1602783176460/work
-nbconvert @ file:///tmp/build/80754af9/nbconvert_1601914830498/work
-nbformat @ file:///tmp/build/80754af9/nbformat_1602783287752/work
+nbclient
+nbconvert
+nbformat
 ncbi-genome-download==0.3.0
 nest-asyncio==1.4.2
 notebook==6.1.5
@@ -79,20 +79,20 @@ parso==0.7.1
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==7.2.0
-plotly @ file:///tmp/build/80754af9/plotly_1601587622649/work
+plotly
 prometheus-client==0.8.0
-prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1602688806899/work
+prompt-toolkit
 ptyprocess==0.6.0
-pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
-Pygments @ file:///tmp/build/80754af9/pygments_1604103097372/work
+pycparser
+Pygments
 pyparsing==2.4.7
 Pyphen==0.10.0
 pypng==0.0.20
-pyrsistent @ file:///tmp/build/80754af9/pyrsistent_1600141720057/work
+pyrsistent
 python-dateutil==2.8.1
 pytz==2020.1
 pyzmq==19.0.2
-qtconsole @ file:///tmp/build/80754af9/qtconsole_1600870028330/work
+qtconsole
 QtPy==1.9.0
 reportlab==3.5.55
 requests==2.24.0
@@ -102,7 +102,7 @@ scikit-learn==0.23.2
 scipy==1.5.3
 seaborn==0.11.0
 Send2Trash==1.5.0
-sip==4.19.13
+sip
 six==1.15.0
 sklearn==0.0
 sniffio==1.2.0
@@ -113,12 +113,12 @@ tinycss2==1.1.0
 tornado==6.0.4
 toyplot==0.19.0
 toytree==2.0.1
-traitlets @ file:///tmp/build/80754af9/traitlets_1602787416690/work
+traitlets
 urllib3==1.25.10
-wcwidth @ file:///tmp/build/80754af9/wcwidth_1593447189090/work
+wcwidth
 WeasyPrint==52.1
 webencodings==0.5.1
 Werkzeug==1.0.1
 widgetsnbextension==3.5.1
 xmltodict==0.12.0
-zipp @ file:///tmp/build/80754af9/zipp_1604001098328/work
+zipp

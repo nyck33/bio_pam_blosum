@@ -46,8 +46,8 @@ needleman_intro = dbc.Container([
             dbc.Col([
                 html.P("Written in Python using Plotly Dash"),
                 html.P(
-                    "By Fei Xiang (dynamic programming engine) " 
-                    "and Nobutaka Kim (frontend and NCBI API calls)"
+                    "By Fei Xiang (dynamic programming algorithms) " 
+                    "and Nobutaka Kim (frontend, NCBI API, BioPython backup engine)"
                 )
 
             ], width=12)

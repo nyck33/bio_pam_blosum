@@ -23,6 +23,9 @@ print(f'abs_file_path: {abs_file_path}')
 file = 'human_v_mus.fasta'
 #data = open(abs_file_path).read()
 
+#todo: cheating with global
+file_path = ""
+
 plots_page = dbc.Container([
     dbc.Row([
         dbc.Col([

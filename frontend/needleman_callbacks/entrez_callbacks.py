@@ -270,6 +270,7 @@ def register_entrez_callbacks(app):
 # run needle and waterman
     @app.callback(
         [Output('needleman-output', 'children'),
+         Output('needleman-output-2', 'children'),
        Output('waterman-output', 'children'),
        Output('needle-water-ctx', 'children')],
       [Input('run-needleman', 'n_clicks'),
@@ -304,6 +305,7 @@ def register_entrez_callbacks(app):
             # get list of named tuples
             alignments = needle.alignments
             alignments_html = format_output(alignments)
+            new_html = reformat_output(alignments)
             return alignments_html, no_update, ctx_msg
 
         if trigger=="run-waterman":
@@ -323,19 +325,42 @@ def register_entrez_callbacks(app):
         for i in range(len(alignments)):
             align_str = pairwise2.format_alignment(*alignments[i])
             align_str_arr.append(align_str)
-        #print(f'align_str:\n{align_str_arr[0]}')
+        # reformat
+
         alignments_html = html.Div([
             html.P(
-                align_str_arr[i]
+                align_str_arr[i],
+                style={
+                    'word-wrap': 'break-word'
+                }
             ) for i in range(len(align_str_arr))
         ])
 
-        '''
-        alignments_html = html.Pre(
-            align_str_arr[:],
-            style={
-                'whiteSpace':
-            }
-        )
-        '''
         return alignments_html
+
+    def reformat_output(alignments_arr):
+        """
+        Just return one
+        :param alignments_arr:
+        :return:
+        """
+        alignment = alignments_arr[0]
+        seqA = str(alignment.seqA)
+        seqB = str(alignment.seqB)
+
+        # break into 50 characters into array
+        lenA = len(seqA)
+        lenB = len(seqB)
+        '''
+        arrA = split seqA by 50
+        arrB
+        alignments_html = html.Div([
+            html.P(
+                f'{arrA[i]}\n{arrB[i]}',
+                style={
+                    'word-wrap': 'break-word'
+                }
+            ) for i in range(len(align_str_arr))
+        ])
+        '''
+        pass

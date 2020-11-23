@@ -28,6 +28,8 @@ then include filepath as data in html output to Div element holding
 alignment chart
 
 """
+#todo: cheating with global
+file_path = ""
 def register_visual_callbacks(app):
 
     @app.callback(
@@ -60,14 +62,20 @@ def register_visual_callbacks(app):
         rel_path = acc1 + \
                    "VS" + acc2 + ".fasta"
         abs_file_path = os.path.join(script_dir, rel_path)
+        #todo: update global
+        file_path = abs_file_path
+
         with open(rel_path, "a") as outfile:
-            for line in multifasta_lines:
-                outfile.write(line)
+            outfile.writelines(multifasta_lines)
+        #for line in multifasta_lines:
+        #   outfile.write(line)
+        outfile.close()
 
         output_html = html.Div([
             dashbio.AlignmentChart(
                 #id='my-chart',
-                data=abs_file_path,
+                #data=abs_file_path,
+                data=file_path,
                 #colorscale='hydro',
                 #conservationcolorscale='blackbody',
                 tilewidth=50

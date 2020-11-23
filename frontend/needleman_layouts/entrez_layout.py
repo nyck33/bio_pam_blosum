@@ -310,9 +310,7 @@ entrez_page = dbc.Container([
         dbc.Col([
             html.H3("Needleman Results"),
             html.P(
-                "Alignments now contains a list of alignments " 
-                "(at least one) which have the same optimal score for the given "
-                "conditions. Bio.pairwise2 will return up to 1000 alignments)."
+                 "Bio.pairwise2 will return up to 1000 alignments)."
             )
         ], width=12),
         dbc.Col([
@@ -320,15 +318,19 @@ entrez_page = dbc.Container([
             html.Div(
                 id="needleman-output"
             )
+        ], width=12),
+        dbc.Col([
+            html.H3("Global Redone"),
+            html.Div(
+                id="needleman-output-2"
+            )
         ], width=12)
     ]),
     dbc.Row([
         dbc.Col([
             html.H3("Waterman Results"),
             html.P(
-                "Alignments now contains a list of alignments " 
-                "(at least one) which have the same optimal score for the given "
-                "conditions. Bio.pairwise2 will return up to 1000 alignments)."
+                "Bio.pairwise2 will return up to 1000 alignments)."
             )
         ], width=12),
         dbc.Col([
