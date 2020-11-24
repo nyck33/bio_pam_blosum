@@ -70,6 +70,8 @@ print(y)
 score_matrix = numpy.zeros((len(x) + 1, len(y) + 1), dtype=int)
 pointer_matrix = numpy.zeros((len(x) + 1, len(y) + 1, 3), dtype=int)
 
+print(f'score matrix\n{score_matrix}')
+print(f'pointer matrix\n{pointer_matrix}')
 # Fill in first row and column with the linear gap penalties
 for xi, xaa in enumerate(x):
     score_matrix[xi + 1, 0] = gap_penalty * (xi + 1)

@@ -44,10 +44,12 @@ needleman_intro = dbc.Container([
 
         dbc.Row([
             dbc.Col([
-                html.P("Written in Python using Plotly Dash"),
                 html.P(
                     "By Nobutaka Kim using Plotly Dash, NCBI API's "
                     "and BioPython"
+                ),
+                html.P(
+                    "email: kimn13@mytru.ca"
                 )
 
             ], width=12)

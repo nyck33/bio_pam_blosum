@@ -25,7 +25,7 @@ from Bio.Align import substitution_matrices
 #import layouts
 from frontend.needleman_layouts.entrez_layout import entrez_page, matrix_names_arr
 from frontend.needleman_layouts.intro_layout import needleman_intro
-from frontend.needleman_layouts.visual_layout import plots_page, abs_file_path
+from frontend.needleman_layouts.visual_layout import plots_page
 
 #import register_callbacks
 from frontend.needleman_callbacks.entrez_callbacks import register_entrez_callbacks
@@ -115,6 +115,12 @@ content = dbc.Container([
             ),
             dcc.Store(
                 id="aligned-B"
+            ),
+            dcc.Store(
+                id="aligned-fasta-store"
+            ),
+            html.Div(
+                id="aligned-fasta-output"
             ),
             html.Div(
                 id='aligned-A-output'

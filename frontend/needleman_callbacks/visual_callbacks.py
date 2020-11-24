@@ -11,6 +11,7 @@ from dash import no_update
 import dash
 import dash_bio as dashbio
 import dash_html_components as html
+import base64
 
 #import ncbi search class
 from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
@@ -19,6 +20,8 @@ from backend.bio_needleman import Needleman
 import datetime
 import json
 import os
+
+from frontend.needleman_layouts.visual_layout import DATASETS
 
 """
 When button pressed, get fastas and write a new file 
@@ -40,94 +43,50 @@ def register_visual_callbacks(app):
 
     @app.callback(
         Output('alignment-viewer-output', 'children'),
-        [Input('my-alignment-viewer', 'eventDatum')]
+        [Input('alignment-chart', 'eventDatum')]
     )
-    def update_output(value):
-        if value is None:
-            return 'No data'
-        return str(value)
+    def update_output(data):
+        if data is None:
+            data = '{}'
+
+        data = json.loads(data)
+        if len(data.keys())==0:
+            return "no data"
+
+        return [
+            html.Div(f'-{key}: {data[key]}') for key in data.keys()
+        ]
+
+    #todo: aligned-fasta-store updated on entrez-callbacks
+    # Handle file upload/selection into data store
+    @app.callback(
+        Output('aligned-fasta-store2', 'data'),
+        [Input('alignment-dropdown', 'value'),
+         Input('alignment-file-upload', 'contents'),
+         Input('alignment-file-upload', 'filename')]
+    )
+    def update_storage(dropdown, contents, filename):
+
+        if (contents is not None) and ('fasta' in filename):
+            content_type, content_string = contents.split(',')
+            content = base64.b64decode(content_string).decode('UTF-8')
+        else:
+            content = DATASETS[dropdown]
+
+        #jsonify
+        #json_content = json.loads(content)
+                    
+        return content
+
 
     @app.callback(
-        [Output('aligned-fasta', 'data')],
-         [Input('btn-align-chart', 'n_clicks')],
-        [State('accession-store-1', 'data'),
-         State('accession-store-2', 'data'),
-         State('aligned-A', 'data'),
-         State('aligned-B', 'data')]
+        Output('alignment-chart', 'data'),
+        [Input('aligned-fasta-store2', 'data')]
     )
-    def update_aligned_fasta_store(n_clicks, acc1_json, acc2_json,
-                                seqA_json, seqB_json):
-        if n_clicks <=0:
-            return no_update
-        acc1 = json.loads(acc1_json)
-        acc2 = json.loads(acc2_json)
-        print(f'acc: {acc1}, {acc2}')
-        # load aligned string sequences
-        seqA = json.loads(seqA_json)
-        seqB = json.loads(seqB_json)
-        print(f'seqs from json:\n{seqA}\n{seqB}')
+    def update_chart(input_data):
+        return input_data
 
-        fasta1_desc = get_fasta_by_accession(acc1, full_fasta=True)
-        fasta2_desc = get_fasta_by_accession(acc2, full_fasta=True)
 
-        #write a string of both fastas
-        fasta_str = ">"
-        fasta_str += fasta1_desc
-        for char in range(len(seqA)):
-            if char % 50 == 0 and char > 0:
-                fasta_str += "\n"
-        #terminate fasta 1
-        fasta_str += "\n"
-        fasta_str += ">"
-        fasta_str += fasta2_desc
-        for char in range(len(seqB)):
-            if char % 50 == 0 and char > 0:
-                fasta_str += "\n"
 
-        # todo: need json?
-        align_fasta_json = json.dumps(fasta_str)
-        # try writing to file
-        script_dir = os.path.dirname(__file__)
-        rel_path = "temp.fasta"
-        abs_file_path = os.path.join(script_dir, rel_path)
 
-        with open(rel_path, "w") as outfile:
-                outfile.write(fasta_str)
-        outfile.close()
 
-        return align_fasta_json
-
-    """
-    show the aligned fasta in dcc.Store()
-    
-    """
-    @app.callback(
-        Output('aligned-fasta-output', 'children'),
-        [Input('aligned-fasta-store', 'data')]
-    )
-    def show_aligned_fasta(align_json):
-        if align_json is None:
-            return no_update
-        align_str = json.loads(align_json)
-
-        align_html = html.P(
-            align_str,
-
-        )
-        return align_html
-
-    """
-    https://github.com/plotly/dash-bio/blob/master/tests/dashbio_demos/dash-alignment-chart/app.py
-    seems to return json so try string, then json
-    """
-    @app.callback(
-        [Output('my-alignment-viewer', 'data'),
-         Output('my-alignment-viewer-json', 'data')],
-        [Input('aligned-fasta-store', 'data')]
-    )
-    def update_chart_data(fasta_json):
-        if not fasta_json:
-            return no_update
-
-        fasta_str = json.loads(fasta_json)
-        return fasta_str, fasta_json

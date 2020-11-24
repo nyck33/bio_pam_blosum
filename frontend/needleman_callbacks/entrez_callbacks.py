@@ -4,6 +4,7 @@ import io
 import pandas as pd
 import json
 import textwrap
+import os
 
 import dash_bio as dashbio
 import six.moves.urllib.request as urlreq
@@ -347,6 +348,7 @@ def register_entrez_callbacks(app):
             aligned2_json = json.dumps(aligned_seq2)
 
             alignments_html = format_output(alignments)
+
             return aligned1_json, aligned2_json, alignments_html, no_update,  ctx_msg
 
         if trigger=="run-waterman":
@@ -417,3 +419,60 @@ def register_entrez_callbacks(app):
         ])
 
         return alignA_html, alignB_html
+
+    @app.callback(
+        [Output("aligned-fasta-store", 'data'),
+         Output("aligned-fasta-output", 'children')],
+        [Input('btn-align-fasta', 'n_clicks')],
+        [State("aligned-A", 'data'),
+         State("aligned-B", "data")],
+        [State('accession-store-1', 'data'),
+         State('accession-store-2', 'data')]
+    )
+    def make_aligned_fasta(n_clicks, align1_json, align2_json,
+                           acc1_json, acc2_json):
+        if n_clicks <=0:
+            return no_update, no_update
+        acc1 = json.loads(acc1_json)
+        acc2 = json.loads(acc2_json)
+        print(f'acc: {acc1}, {acc2}')
+        # load aligned string sequences
+        seqA = json.loads(align1_json)
+        seqB = json.loads(align2_json)
+        print(f'seqs from json:\n{seqA}\n{seqB}')
+
+        fasta1_desc = get_fasta_by_accession(acc1, full_fasta=True)
+        fasta2_desc = get_fasta_by_accession(acc2, full_fasta=True)
+
+        #write a string of both fastas
+        fasta_str = ""
+        fasta_str += fasta1_desc
+        char=0
+        for char in range(len(seqA)):
+            if char % 50 == 0 and char > 0:
+                fasta_str += "\n"
+            else:
+                fasta_str += seqA[char]
+        #terminate fasta 1
+        fasta_str += "\n"
+        #fasta_str += ">"
+        char=0
+        fasta_str += fasta2_desc
+        for char in range(len(seqB)):
+            if char % 50 == 0 and char > 0:
+                fasta_str += "\n"
+            else:
+                fasta_str += seqB[char]
+
+        # try writing to file
+        full_path = "/home/nobu/Desktop/BioInformatics/bio_pam_blosum/frontend/needleman_layouts/data"
+        #script_dir = os.path.dirname(__file__)
+        rel_path = "temp.fasta"
+        abs_file_path = os.path.join(full_path, rel_path)
+
+        with open(abs_file_path, "w") as outfile:
+            outfile.write(fasta_str)
+
+        #jsonify
+        aligned_fasta_json = json.dumps(fasta_str)
+        return aligned_fasta_json, fasta_str

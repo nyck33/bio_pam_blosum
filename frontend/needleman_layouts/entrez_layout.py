@@ -385,6 +385,16 @@ entrez_page = dbc.Container([
                 type="cube"
             )
         ], width=12),
+    ]),
+    dbc.Row([
+        dbc.Col([
+            dbc.Button(
+                "Make aligned Fasta for chart",
+                id='btn-align-fasta',
+                color="danger",
+                n_clicks=0
+            )
+        ], width=12),
         dbc.Col([
             html.H3("Needle Water context check"),
             html.Div(
