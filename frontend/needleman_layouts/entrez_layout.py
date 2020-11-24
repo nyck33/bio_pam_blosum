@@ -40,7 +40,6 @@ entrez_page = dbc.Container([
                 "check store 2",
                 id="check-store-2"
             ),
-
             html.Div(
                 "context checker",
                 id='ctx-check'
@@ -49,6 +48,7 @@ entrez_page = dbc.Container([
                 "other debug output",
                 id='debug-out'
             )
+
         ], width=12)
     ]),
     #######################################################################
@@ -122,7 +122,12 @@ entrez_page = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            html.Label("NCBI Search by Text Results appear here"),
+            html.Label(
+                "NCBI Search by Text Results appear here",
+                style ={
+                    "display": "none"
+                }
+            ),
             dcc.Loading(
                 id='ncbi-textsearch-loading',
                 children=[
@@ -137,10 +142,9 @@ entrez_page = dbc.Container([
                 id='query-translation-loading',
                 children=[
                     html.Div(
-                        "query translation output",
                         id="query-translation-output"
                     )],
-                    type="graph"
+                    type="dot"
             )
         ], width=12)
     ]),
@@ -150,12 +154,11 @@ entrez_page = dbc.Container([
             html.H3("3. Upload 2 fasta files or a multi-fasta file of 2 sequences")
         ], width=12),
         dbc.Col([
-            html.Label("fasta file 1"),
             dcc.Upload(
                 id='upload-data',
                 children=html.Div(
                     "Drag and Drop or \n"
-                    "Select Fasta from Files"
+                    "Select Fasta File 1 from Files"
                 ),
                 style={
                     'width': '95%',
@@ -171,12 +174,11 @@ entrez_page = dbc.Container([
             ),
         ], width=6),
         dbc.Col([
-            html.Label("fasta file 2"),
             dcc.Upload(
                 id='upload-data-two',
                 children=html.Div([
                     "Drag and Drop or "
-                    "Select Fasta from Files"
+                    "Select Fasta File 2 from Files"
                 ]),
                 style={
                     'width': '95%',
@@ -251,7 +253,7 @@ entrez_page = dbc.Container([
                     html.Div(
                         id="gb-output"
                     )],
-                    type="dot"
+                    type="circle"
             ),
             html.Br(),
             dbc.Button(
@@ -267,7 +269,7 @@ entrez_page = dbc.Container([
                     html.Div(
                         id="gb2-output"
                     )],
-                    type="default"
+                    type="circle"
             ),
         ])
     ]),
@@ -350,32 +352,24 @@ entrez_page = dbc.Container([
     html.Hr(),
     dbc.Row([
         dbc.Col([
-            html.H3("Needleman Results"),
             html.P(
-                 "Bio.pairwise2 will return up to 1000 alignments)."
+                 "Bio.pairwise2 will return up to 1000 alignments."
             )
         ], width=12),
         dbc.Col([
-            html.H3("Global Alignments"),
+
             dcc.Loading(
                 id='needleman-loading',
                 children=[
                     html.Div(
                         id="needleman-output"
                     )],
-                    type="circle"
+                    type="cube"
             )
         ], width=12),
     ]),
     dbc.Row([
         dbc.Col([
-            html.H3("Waterman Results"),
-            html.P(
-                "Bio.pairwise2 will return up to 1000 alignments)."
-            )
-        ], width=12),
-        dbc.Col([
-            html.H3("Local Alignments"),
             dcc.Loading(
                 id='waterman-loading',
                 children=[
@@ -395,16 +389,11 @@ entrez_page = dbc.Container([
                 n_clicks=0
             )
         ], width=12),
+
         dbc.Col([
-            html.H3("Needle Water context check"),
+            html.P("Needle Water context check"),
             html.Div(
                 id="needle-water-ctx"
-            )
-        ], width=12),
-        dbc.Col([
-            html.H3("test format"),
-            html.P(
-
             )
         ], width=12),
     ])

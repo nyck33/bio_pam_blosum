@@ -347,7 +347,7 @@ def register_entrez_callbacks(app):
             aligned1_json = json.dumps(aligned_seq1)
             aligned2_json = json.dumps(aligned_seq2)
 
-            alignments_html = format_output(alignments)
+            alignments_html = format_output(alignments, "Needleman-Wunsch")
 
             return aligned1_json, aligned2_json, alignments_html, no_update,  ctx_msg
 
@@ -363,10 +363,10 @@ def register_entrez_callbacks(app):
             aligned1_json = json.dumps(aligned_seq1)
             aligned2_json = json.dumps(aligned_seq2)
 
-            alignments_html = format_output(alignments)
+            alignments_html = format_output(alignments, "Smith-Waterman")
             return aligned1_json, aligned2_json, no_update, alignments_html, ctx_msg
 
-    def format_output(alignments):
+    def format_output(alignments, algo_name):
         """
 
         :param alignments:
@@ -378,15 +378,24 @@ def register_entrez_callbacks(app):
             align_str = pairwise2.format_alignment(*alignments[i])
             align_str_arr.append(align_str)
         # reformat
+        alignment_type = ""
+        if algo_name == "Needleman-Wunsch":
+            alignment_type="Global"
+        else:
+            alignment_type="Local"
+        alignments_html = \
+            html.Div([
+                html.H3(f"{algo_name} {alignment_type} Alignments"),
+                html.Div([
+                    html.P(
+                        align_str_arr[i],
+                        style={
+                            'word-wrap': 'break-word'
+                        }
+                    ) for i in range(len(align_str_arr))
+                ])
+            ])
 
-        alignments_html = html.Div([
-            html.P(
-                align_str_arr[i],
-                style={
-                    'word-wrap': 'break-word'
-                }
-            ) for i in range(len(align_str_arr))
-        ])
 
         return alignments_html
 
@@ -421,8 +430,10 @@ def register_entrez_callbacks(app):
         return alignA_html, alignB_html
 
     @app.callback(
-        [Output("aligned-fasta-store", 'data'),
-         Output("aligned-fasta-output", 'children')],
+        #[Output("aligned-fasta-store", 'data'),
+         #Output("aligned-fasta-output", 'children'),
+         [Output('descrip-A-store', 'data'),
+         Output('descrip-B-store', 'data')],
         [Input('btn-align-fasta', 'n_clicks')],
         [State("aligned-A", 'data'),
          State("aligned-B", "data")],
@@ -443,6 +454,10 @@ def register_entrez_callbacks(app):
 
         fasta1_desc = get_fasta_by_accession(acc1, full_fasta=True)
         fasta2_desc = get_fasta_by_accession(acc2, full_fasta=True)
+
+        #jsonify descriptions
+        fasta1_desc_json = json.dumps(str(fasta1_desc))
+        fasta2_desc_json = json.dumps(str(fasta2_desc))
 
         #write a string of both fastas
         fasta_str = ""
@@ -475,4 +490,6 @@ def register_entrez_callbacks(app):
 
         #jsonify
         aligned_fasta_json = json.dumps(fasta_str)
-        return aligned_fasta_json, fasta_str
+        #return aligned_fasta_json, fasta_str, fasta1_desc_json, \
+        return fasta1_desc_json,\
+                fasta2_desc_json

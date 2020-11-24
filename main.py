@@ -119,14 +119,23 @@ content = dbc.Container([
             dcc.Store(
                 id="aligned-fasta-store"
             ),
-            html.Div(
-                id="aligned-fasta-output"
+            dcc.Store(
+                id='descrip-A-store'
+            ),
+            dcc.Store(
+                id="descrip-B-store"
             ),
             html.Div(
-                id='aligned-A-output'
+                id="aligned-fasta-output",
+                style={'display': 'none'}
             ),
             html.Div(
-                id='aligned-B-output'
+                id='aligned-A-output',
+                style={'display': 'none'}
+            ),
+            html.Div(
+                id='aligned-B-output',
+                style={'display': 'none'}
             ),
             html.Div(
                 id="page-content",

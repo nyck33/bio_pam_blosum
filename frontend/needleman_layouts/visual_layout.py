@@ -90,7 +90,7 @@ plots_page = dbc.Container([
                 id='alignment-file-upload',
                 className='control-upload',
                 children=html.Div([
-                    "Drag and drop FASTA files or select files."
+                    "Drag and drop multifasta files or select files."
                 ]),
                 style={
                     'width': '95%',
@@ -105,15 +105,26 @@ plots_page = dbc.Container([
                 multiple=False
             ),
             html.Br(),
+            html.Div(
+                id='desc-1'
+            ),
+            html.Div(
+                id='vs'
+            ),
+            html.Div(
+                id='desc-2'
+            ),
+            html.Br(),
             dcc.Loading(
                 children=[
-                html.Div([
-                    dash_bio.AlignmentChart(
-                            id='alignment-chart',
-                            height=725,
-                            data=dataset3
-                    )
-                ])
+                    html.Div([
+                        dash_bio.AlignmentChart(
+                                id='alignment-chart',
+                                height=725,
+                                tilewidth=50,
+                                data=dataset3
+                        )
+                    ])
                 ]
             ),
             html.Div(

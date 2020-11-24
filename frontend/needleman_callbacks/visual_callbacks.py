@@ -66,7 +66,6 @@ def register_visual_callbacks(app):
          Input('alignment-file-upload', 'filename')]
     )
     def update_storage(dropdown, contents, filename):
-
         if (contents is not None) and ('fasta' in filename):
             content_type, content_string = contents.split(',')
             content = base64.b64decode(content_string).decode('UTF-8')
@@ -80,11 +79,24 @@ def register_visual_callbacks(app):
 
 
     @app.callback(
-        Output('alignment-chart', 'data'),
-        [Input('aligned-fasta-store2', 'data')]
+        [Output('alignment-chart', 'data'),
+        Output('desc-1', 'children'),
+         Output('vs', 'children'),
+        Output('desc-2', 'children')],
+        [Input('aligned-fasta-store2', 'data')],
+        [State('descrip-A-store', 'data'),
+         State('descrip-B-store', 'data')]
     )
-    def update_chart(input_data):
-        return input_data
+    def update_chart(input_data, descrip1_json, descrip2_json):
+        if descrip1_json is not None:
+            descrip1 = json.loads(descrip1_json)
+        else:
+            descrip1 = "sequence A"
+        if descrip2_json is not None:
+            descrip2 = json.loads(descrip2_json)
+        else:
+            descrip2 = "sequence B"
+        return input_data, descrip1, "vs", descrip2
 
 
 
