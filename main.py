@@ -89,9 +89,9 @@ sidebar = html.Div(
         ),
         dbc.Nav(# todo: show res below params using callback and plots on plots
             [
-                dbc.NavLink("Project intro", href="/project-intro", id="intro-link"),
+                dbc.NavLink("Project Intro", href="/project-intro", id="intro-link"),
                 dbc.NavLink("Entrez Search, Needleman-Wunsch, Smith-Waterman", href="/entrez-parameters", id="parameters-link"),
-                dbc.NavLink("Dash Bio Demo", href="/plots", id="plots"),
+                dbc.NavLink("Alignment Chart", href="/plots", id="plots"),
             ],
             vertical=True,
             pills=True,

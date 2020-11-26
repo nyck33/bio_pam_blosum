@@ -25,7 +25,7 @@ seqB = ""
 #seqs_arr = []
 gap = "-"
 
-# dict from code to alpha residue
+# dict from code to alpha residue since numpy array doesn't hold alphas
 code_to_seqs_dict={"code": "residue"}
 
 seqs_dict = {"diag": [], "up": "", "left": ""}
