@@ -23,13 +23,16 @@ from Bio import SeqIO
 from Bio.Align import substitution_matrices
 
 #import layouts
-from frontend.needleman_layouts.entrez_layout import entrez_page, matrix_names_arr
 from frontend.needleman_layouts.intro_layout import needleman_intro
+from frontend.needleman_layouts.entrez_layout import entrez_page, matrix_names_arr
+from frontend.needleman_layouts.blast_layout import blast_layout
 from frontend.needleman_layouts.visual_layout import plots_page
 
 #import register_callbacks
 from frontend.needleman_callbacks.entrez_callbacks import register_entrez_callbacks
+from frontend.needleman_callbacks.blast_callbacks import register_blast_callbacks
 from frontend.needleman_callbacks.visual_callbacks import register_visual_callbacks
+
 #import ncbi search class
 from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
 from Bio import Entrez
@@ -46,8 +49,6 @@ handle = Entrez.einfo(db='protein')
 #record= Entrez.read(handle)
 # see all available db's
 
-#todo: backend import
-#from backend.pam import main, trace_back, build_matrics, load, parse_name, compare
 
 #todo: cheating with global
 file_path = ""
@@ -62,6 +63,7 @@ app.title = "Needleman Wunsch and NCBI"
 #register callbacks
 register_entrez_callbacks(app)
 register_visual_callbacks(app)
+register_blast_callbacks(app)
 ###############################################################
 SIDEBAR_STYLE={
     "position": "fixed",
@@ -91,7 +93,9 @@ sidebar = html.Div(
             [
                 dbc.NavLink("Project Intro", href="/project-intro", id="intro-link"),
                 dbc.NavLink("Entrez Search, Needleman-Wunsch, Smith-Waterman", href="/entrez-parameters", id="parameters-link"),
+                dbc.NavLink("Blast", href="/blast", id="protein-blast"),
                 dbc.NavLink("Alignment Chart", href="/plots", id="plots"),
+
             ],
             vertical=True,
             pills=True,
@@ -105,10 +109,22 @@ content = dbc.Container([
     dbc.Row([
         dbc.Col([
             dcc.Store(
+                id="blast-seq1-store"
+            ),
+            dcc.Store(
+                id="blast-seq2-store"
+            ),
+            dcc.Store(
                 id="accession-store-1"
             ),
             dcc.Store(
                 id="accession-store-2"
+            ),
+            dcc.Store(
+                id='descrip-A-store'
+            ),
+            dcc.Store(
+                id="descrip-B-store"
             ),
             dcc.Store(
                 id="aligned-A"
@@ -119,16 +135,11 @@ content = dbc.Container([
             dcc.Store(
                 id="aligned-fasta-store"
             ),
-            dcc.Store(
-                id='descrip-A-store'
-            ),
-            dcc.Store(
-                id="descrip-B-store"
-            ),
             html.Div(
                 id="aligned-fasta-output",
                 style={'display': 'none'}
             ),
+
             html.Div(
                 id='aligned-A-output',
                 style={'display': 'none'}
@@ -153,17 +164,20 @@ app.layout=html.Div([dcc.Location(id="url"), sidebar, content])
 @app.callback(
     [Output('intro-link', "active"),
     Output('parameters-link', "active"),
+    Output('protein-blast','active'),
     Output('plots', "active")],
     [Input("url", "pathname")],
 )
 def toggle_active_links(pathname):
     if pathname == "/" or pathname=="/project-intro":
         #Treat page intro as the homepage/index
-        return True, False, False
+        return True, False, False, False
     elif pathname == "/entrez-parameters":
-        return False, True, False
+        return False, True, False, False
+    elif pathname == "/blast":
+        return False, False, True, False
     else:
-        return False, False, True
+        return False, False, False, True
 
 @app.callback(Output("page-content", "children"),
               [Input("url", "pathname")])
@@ -172,6 +186,8 @@ def render_page_content(pathname):
         return needleman_intro
     elif pathname == "/entrez-parameters":
         return entrez_page
+    elif pathname=="/blast":
+        return blast_layout
     elif pathname == "/plots":
         return plots_page
     return dbc.Jumbotron([
@@ -179,15 +195,6 @@ def render_page_content(pathname):
     html.Hr(),
     html.P(f'The pathname {pathname} was not recognized...')
 ])
-
-#################################################################################
-#register callbacks
-#register_entrez_callbacks(app)
-#register_intro_callbacks(app)
-#####################################################################################
-#entrez callbacks
-
-
 
 #####################################################################################
 
