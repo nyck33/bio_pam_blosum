@@ -48,7 +48,7 @@ seqA = alignA.seqA
 seqB = alignA.seqB
 score = alignA.score
 start = alignA.start
-end = alignA.end
+end = alignA.endb
 
 print(type(seqA), type(seqB), type(score), type(start), type(end))
 print(seqA, seqB)

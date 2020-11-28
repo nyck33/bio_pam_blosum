@@ -49,7 +49,6 @@ handle = Entrez.einfo(db='protein')
 #record= Entrez.read(handle)
 # see all available db's
 
-
 #todo: cheating with global
 file_path = ""
 

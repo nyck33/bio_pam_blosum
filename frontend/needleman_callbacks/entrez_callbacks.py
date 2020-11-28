@@ -36,7 +36,7 @@ def register_entrez_callbacks(app):
     )
     def show_seq1_json(seq1_json):
         seq1_str = json.loads(seq1_json)
-        return seq1_str
+        return seq1_str[:200]
 
     @app.callback(
         Output('check-store-2', 'children'),
@@ -44,7 +44,7 @@ def register_entrez_callbacks(app):
     )
     def show_seq1_json(seq2_json):
         seq2_str = json.loads(seq2_json)
-        return seq2_str
+        return seq2_str[:200]
 
     #################################################################
     #slider callbacks
@@ -186,13 +186,13 @@ def register_entrez_callbacks(app):
             html.H6(datetime.datetime.fromtimestamp(date)),
             html.P(f"accession: {acc_num}"),
             html.Div([
-                html.P(decoded)
+                html.P(decoded[:200])
             ]),
             html.Hr(),
 
             # debugging content
             html.Div('Raw Content'),
-            html.Pre(contents[:],
+            html.Pre(contents[0:200] + '...',
                     style={
                         'whiteSpace': 'pre-wrap',
                         'wordBreak': 'break-all'

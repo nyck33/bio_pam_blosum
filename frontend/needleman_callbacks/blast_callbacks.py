@@ -98,8 +98,8 @@ def register_blast_callbacks(app):
                     alignment_dict['length'] = alignment.length
                     alignment_dict['e-value'] = hsp.expect
                     alignment_dict['query_seq'] = hsp.query[0:80]
-                    alignment_dict['query_match'] = hsp.match[0:80]
-                    alignment_dict['subject_seq'] = hsp.sbjct[0:80]
+                    alignment_dict['query_match'] = hsp.match[0:300]
+                    alignment_dict['subject_seq'] = hsp.sbjct[0:]
             alignments_dict_arr.append(deepcopy(alignment_dict))
             alignment_dict.clear()
         #query string
