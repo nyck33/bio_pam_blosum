@@ -28,20 +28,53 @@ https://github.com/biopython/biopython/tree/master/Bio/Align/substitution_matric
 from Bio import pairwise2
 from Bio import SeqIO
 from Bio.Align import substitution_matrices
+#local alignment using Aligner:
+from Bio import Align
+import sys
 
 
 matrix=substitution_matrices.load("BLOSUM62")
-seq1 = SeqIO.read("example_fasta_files/homo_sapiens_lactate.fasta", "fasta")
-seq2 = SeqIO.read("example_fasta_files/mus_musculus_lactate.fasta", "fasta")
-
+#seq1 = SeqIO.read("example_fasta_files/homo_sapiens_lactate.fasta", "fasta")
+#seq2 = SeqIO.read("example_fasta_files/mus_musculus_lactate.fasta", "fasta")
+# very long sequences
+seq1 = SeqIO.read("example_fasta_files/corvyllus.fasta", "fasta")
+seq2 = SeqIO.read("example_fasta_files/drosophilaAE014297.fasta", "fasta")
 #params: match, mismatch, gap open, gap extend
+
+seq_str1 = seq1.seq
+seq_str2 = seq2.seq
+
+sizeof1 = sys.getsizeof(seq_str1)
+sizeof2 = sys.getsizeof(seq_str2)
+print(sizeof1, sizeof2)
+
+print(f"size 1: {sys.getsizeof(seq_str1)}\n len: "
+      f"{len(seq_str1)}")
+print(f"size 2: {sys.getsizeof(seq_str2)}\n len: "
+      f"{len(seq_str2)}")
+'''
 match = 2
 mismatch = -1
 gap_open = -10
 gap_extend = -0.5
-alignments = pairwise2.align.globalds(seq1.seq, seq2.seq, matrix,
-                        gap_open, gap_extend)
 
+
+aligner = Align.PairwiseAligner()
+aligner.open_gap_score = gap_open
+aligner.extend_gap_score = gap_extend
+aligner.mode= 'local'
+for alignment in aligner.align(seq_str1, seq_str2):
+    print("Score = %.1f:" % alignment.score)
+    print(alignment[:200])
+'''
+
+
+
+####################################################3
+"""
+#pairwise2 below
+#alignments = pairwise2.align.globalds(seq1.seq, seq2.seq, matrix,
+ #                       gap_open, gap_extend)
 # check types of named tuples in list alignments
 alignA = alignments[0]
 seqA = alignA.seqA
@@ -63,7 +96,7 @@ print(f'x:{x}')
 
 ###################################
 #local alignment
-"""
+
 print("local\n")
 gap_extend = -1
 
