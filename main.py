@@ -175,7 +175,7 @@ def toggle_active_links(pathname):
         return False, True, False, False
     elif pathname == "/blast":
         return False, False, True, False
-    else:
+    elif pathname=="/plots":
         return False, False, False, True
 
 @app.callback(Output("page-content", "children"),

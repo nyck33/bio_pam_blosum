@@ -58,8 +58,9 @@ class Needleman():
         self.matrix = matrix
 
     def align_global(self):
-        seq1 = self.seq1
-        seq2 = self.seq2
+        #todo: cast to string
+        seq1 = str(self.seq1)
+        seq2 = str(self.seq2)
         # alignments is a list of alignments named tuples
 
         alignments = pairwise2.align.globalds(seq1, seq2, self.matrix,

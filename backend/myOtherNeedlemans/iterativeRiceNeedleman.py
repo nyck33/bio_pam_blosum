@@ -1,3 +1,6 @@
+"""
+Rice University resource
+"""
 import numpy
 
 # The alphabet defines the order of amino acids used for the score matrix
