@@ -47,6 +47,7 @@ class Needleman():
     def parse_name(self, mode):
         """
         return absolute file path of matrix file, ex. folder/blosum62
+        https://stackoverflow.com/a/4060259/9481613
         :param mode:
         :return:
         """
