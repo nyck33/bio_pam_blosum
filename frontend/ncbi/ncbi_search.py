@@ -2,6 +2,8 @@ from Bio import Entrez
 from Bio import SeqIO
 import xmltodict
 
+Entrez.email = "nobutaka@gatech.edu"
+
 def get_last_updated(record):
     return record['DbInfo']['LastUpdate']
 
