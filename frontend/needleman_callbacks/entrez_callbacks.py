@@ -29,6 +29,13 @@ from backend.bio_needleman import Needleman
 
 def register_entrez_callbacks(app):
     #debug json stores
+    @app.callback(
+        Output('check-usr-email', 'children'),
+        [Input('user-email-store', 'data')]
+    )
+    def show_user_email(usr_email_json):
+        usr_email_str = json.loads(usr_email_json)
+        return usr_email_str
 
     @app.callback(
         Output('check-store-1', 'children'),

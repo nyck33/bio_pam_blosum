@@ -1,3 +1,8 @@
+'''
+todo: accept user email here and store as a session variable for each user
+'''
+
+
 import base64
 import datetime
 import io
@@ -30,6 +35,11 @@ entrez_page = dbc.Container([
     # debug and store
     dbc.Row([
         dbc.Col([
+            dcc.Store(id="user-email-store"),
+            html.Div(
+                "check user-email",
+                id='check-usr-email'
+            ),
             dcc.Store(id="sequence-1-store"),
             html.Div(
                 "check store 1",
@@ -53,6 +63,26 @@ entrez_page = dbc.Container([
     ]),
     #######################################################################
     #accession input
+    dbc.Row([
+        dbc.Col([
+            html.H3(
+                "Input your email to use for NCBI Entrez API calls.  Do not abuse the service."
+            ),
+            html.Br(),
+            html.Label("Email:"),
+            dcc.Input(
+                id="email-input",
+                type="text",
+                size="60"
+            ),
+            dbc.Button(
+                'Store Email',
+                id='btn-acc-1',
+                color="primary",
+                n_clicks=0
+            ),
+        ])
+    ]),
     dbc.Row([
         dbc.Col([
             html.H3(
