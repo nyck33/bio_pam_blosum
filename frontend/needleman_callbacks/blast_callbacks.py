@@ -226,7 +226,6 @@ def register_blast_callbacks(app):
     )
     
     
-    
     @app.callback(
         Output('blast-seq2-store', 'data'),
         [Input(f'{v}-btn') for json.loads('blstp-res-store')[0][]]
