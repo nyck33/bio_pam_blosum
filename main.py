@@ -38,13 +38,14 @@ from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, 
 from Bio import Entrez
 from Bio import SeqIO
 # Entrez connection
-Entrez.email = "nobutaka@gatech.edu"
+#todo: putting all this in ncbi_search.py
+#Entrez.email = ""
 # tool defaults to BioPython
 #Entrez.tool = "getProteinFastas" #homologs later
-db = 'protein'
+#db = 'protein'
 #todo: learn to use this and adjust retmax
 #paramEutils = {'usehistory': 'Y'}
-handle = Entrez.einfo(db='protein')
+#handle = Entrez.einfo(db='protein')
 # record is a dictionary record['DbInfo']['FieldList] shows
 #record= Entrez.read(handle)
 # see all available db's
@@ -54,7 +55,7 @@ file_path = ""
 
 #register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
-app = Dash(external_stylesheets=external_stylesheets)
+app = Dash(external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 app.title = "Needleman Wunsch and NCBI"
 #app.config['suppress_callback_exceptions'] = True
 

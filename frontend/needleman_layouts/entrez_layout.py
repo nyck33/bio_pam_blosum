@@ -38,7 +38,7 @@ entrez_page = dbc.Container([
             dcc.Store(id="user-email-store"),
             html.Div(
                 "check user-email",
-                id='check-usr-email'
+                id='check-user-email'
             ),
             dcc.Store(id="sequence-1-store"),
             html.Div(
@@ -77,7 +77,7 @@ entrez_page = dbc.Container([
             ),
             dbc.Button(
                 'Store Email',
-                id='btn-acc-1',
+                id='btn-email',
                 color="primary",
                 n_clicks=0
             ),

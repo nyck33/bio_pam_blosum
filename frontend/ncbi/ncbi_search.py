@@ -1,9 +1,16 @@
 from Bio import Entrez
 from Bio import SeqIO
 import xmltodict
+import json
 
-Entrez.email = "nobutaka@gatech.edu"
+user_email = ''
+Entrez.email = user_email
+db = 'protein'
+handle = Entrez.einfo(db=db)
 
+def set_global_email_ncbi_search(email_str):
+    global user_email
+    user_email = email_str
 def get_last_updated(record):
     return record['DbInfo']['LastUpdate']
 
@@ -13,6 +20,9 @@ def searchByTerm(term):
     :param term:
     :return: queryTranslation and accession numbers
     """
+    #todo: move this email inside not global
+    #Entrez.email = "nobutaka@gatech.edu"
+
     db="protein"
     eSearch = Entrez.esearch(db=db, term=term, idtype="acc")
     res = Entrez.read(eSearch)

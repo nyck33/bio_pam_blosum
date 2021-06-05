@@ -21,20 +21,28 @@ from dash.dependencies import Input, Output, State # Load Data
 from Bio import SeqIO
 from Bio import pairwise2
 from Bio.Align import substitution_matrices
+# todo: download temp aligned fasta file to client
+from dash_extensions import Download
 
 #import ncbi search class
-from frontend.ncbi.ncbi_search import get_last_updated, get_fasta_by_accession, get_full_GB_info, searchByTerm
+from frontend.ncbi.ncbi_search import (
+                                set_global_email_ncbi_search,
+                                get_last_updated, get_fasta_by_accession,
+                                get_full_GB_info, searchByTerm)
 #import needleman
 from backend.bio_needleman import Needleman
 
 def register_entrez_callbacks(app):
     #debug json stores
+    #todo: use email debug fn to set global
     @app.callback(
-        Output('check-usr-email', 'children'),
+        Output('check-user-email', 'children'),
         [Input('user-email-store', 'data')]
     )
     def show_user_email(usr_email_json):
         usr_email_str = json.loads(usr_email_json)
+        #todo: this sets on ncbi_search.py
+        set_global_email_ncbi_search(usr_email_str)
         return usr_email_str
 
     @app.callback(
@@ -71,6 +79,16 @@ def register_entrez_callbacks(app):
         return val_string
 
     ######################################################################
+    @app.callback(
+        Output('user-email-store', 'data'),
+        [Input('btn-email', 'n_clicks')],
+        [State('email-input','value')])
+    def store_email(btn_email, email_input):
+        if btn_email <= 0:
+            return no_update
+        email_json = json.dumps(email_input)
+        return email_json
+
     # Update the dcc.Store from whichever input/button combo is pressed
     # todo: parse input of textbox 1 and 2 for multifasta?
     @app.callback(
@@ -487,11 +505,17 @@ def register_entrez_callbacks(app):
                 fasta_str += seqB[char]
 
         # try writing to file
-        full_path = "/home/nobu/Desktop/BioInformatics/bio_pam_blosum/frontend/needleman_layouts/data"
-        #script_dir = os.path.dirname(__file__)
+        #todo: problem here with absolute path,
+        # get __file__ path for this file, go to pardir then change dir
+        #full_path = "/home/nobu/Desktop/BioInformatics/bio_pam_blosum/frontend/needleman_layouts/data"
+        script_dir = os.path.dirname(__file__)
+        #https://stackoverflow.com/a/2860321/9481613
+        par_dir = os.path.dirname(script_dir)
+        data_dir = 'needleman_layouts/data'
+        data_dir = os.path.join(par_dir, data_dir)
         rel_path = "temp.fasta"
-        abs_file_path = os.path.join(full_path, rel_path)
-
+        #abs_file_path = os.path.join(full_path, rel_path)
+        abs_file_path = os.path.join(data_dir, rel_path)
         with open(abs_file_path, "w") as outfile:
             outfile.write(fasta_str)
 

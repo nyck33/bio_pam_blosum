@@ -22,7 +22,6 @@ dash==1.17.0
 dash-bio==0.4.8
 dash-bootstrap-components==0.10.7
 dash-core-components==1.13.0
-dash-extensions==0.0.18
 dash-html-components==1.1.1
 dash-renderer==1.8.3
 dash-table==4.11.0
@@ -67,7 +66,6 @@ kiwisolver==1.2.0
 MarkupSafe==1.1.1
 matplotlib==3.3.2
 mistune==0.8.4
-more-itertools==8.8.0
 multipledispatch==0.6.0
 nbclient==0.5.3
 nbconvert==6.0.7
