@@ -22,17 +22,18 @@ needleman_intro = dbc.Container([
         dbc.Col([
             html.Div([
                 html.H3("Objective"),
-                html.P("To score protein alignments using the matrices from the NCBI website"
-                       "downloaded from their FTP server.  This demonstrates construction of a "
-                       "simple pipeline whose performance matches or exceeds those of EMBOSS if the BioPython "
-                       "methods are used."),
+                html.P("To score protein alignments using the matrices from the NCBI website "
+                       " downloaded from their FTP server.  This demonstrates construction of a "
+                       " simple pipeline whose performance matches or exceeds those of EMBOSS if the BioPython "
+                       " methods are used."),
                 html.Br(),
                 html.P(
-                    "Our implementation is built from scratch using dynamic programming."
-                    "Our project is open source and can be accessed at:"
+                    "This is a work-in-progress to show my knowledge of Python, web programming, CI/CD, containerization,"
+                    " and test automation as well as basic bioinformatics."
+                    " My project repo can be accessed at:"
                 ),
                 html.A(
-                    "Link to project repo",
+                    "Link to bio_pam_blosum",
                     href="https://github.com/nyck33/bio_pam_blosum",
                     target="_blank"
                 )
@@ -45,11 +46,11 @@ needleman_intro = dbc.Container([
         dbc.Row([
             dbc.Col([
                 html.P(
-                    "By Nobutaka Kim using Plotly Dash, NCBI API's "
-                    "and BioPython"
+                    "By Nobutaka Kim using Plotly Dash"
+                    " and BioPython"
                 ),
                 html.P(
-                    "email: kimn13@mytru.ca"
+                    "email: nobutaka@gatech.edu"
                 )
 
             ], width=12)
