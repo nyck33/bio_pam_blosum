@@ -9,3 +9,8 @@ def test_one(dash_duo):
     assert dash_duo.get_logs() == [], "Browser console should contain no errors"
 
     return None
+
+def test_two():
+    app = import_app("tests.app")
+    response = app.get('/')
+    assert response.status_code == 200
