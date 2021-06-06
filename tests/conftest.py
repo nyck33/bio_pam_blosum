@@ -1,3 +1,4 @@
+'''
 from dash.testing.application_runners import import_app
 import pytest
 
@@ -6,3 +7,4 @@ def test_client():
     app = import_app("tests.app")
 
     return app
+'''
