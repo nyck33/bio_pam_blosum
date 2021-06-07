@@ -63,7 +63,7 @@ jobs:
       - run:
           name: Run Chrome via Selenium Server
           command: xvfb-run java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar selenium-server-standalone-3.13.0.jar
-          #background: true
+          background: true
       - run:
           name: Start Headless ChromeDriver
           command: chromedriver --url-base=/wd/hub
