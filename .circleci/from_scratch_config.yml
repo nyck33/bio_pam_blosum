@@ -9,8 +9,8 @@ orbs:
 
 workflows:
   sample:  # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
-    # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows
+    # Inside the workflow, you define the jobs you want to run. 
+    # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows 
     jobs:
       - build-and-test
 
@@ -23,7 +23,7 @@ jobs:
     # The executor is the environment in which the steps below will be executed - below will use a python 3.9 container
     # Change the version below to your required version of python
     docker:
-      - image: circleci/python:3.6.2-stretch-browsers
+      - image: cimg/python:3.8
     # Checkout the code as the first step. This is a dedicated CircleCI step.
     # The python orb's install-packages step will install the dependencies from a Pipfile via Pipenv by default.
     # Here we're making sure we use just use the system-wide pip. By default it uses the project root's requirements.txt.
@@ -41,8 +41,9 @@ jobs:
       - run: sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4
       - run: sudo apt-get install default-jdk
       # Google Chrome
-      - run: sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
-      - run: sudo echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+      - run: sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
+      #- run: echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> sudo tee /etc/apt/sources.list.d/google-chrome.list
+      - run: sudo sh -c "echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >>   /etc/apt/sources.list"
       - run: sudo apt-get -y update
       - run: sudo apt-get -y install google-chrome-stable
       # install Chrome Driver
@@ -61,11 +62,11 @@ jobs:
 
       - run:
           name: Run Chrome via Selenium Server
-          command: xvfb-run java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar selenium-server-standalone.jar
-          #background: true
-      - run:
-          name: Start Headless ChromeDriver
-          command: chromedriver --url-base=/wd/hub
+          command: xvfb-run java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar selenium-server-standalone-3.13.0.jar
+          background: true
+      #- run:
+          #name: Start Headless ChromeDriver
+          #command: chromedriver --url-base=/wd/hub
       - run:
           name: Run Dash tests
           # This assumes pytest is installed via the install-package step above
