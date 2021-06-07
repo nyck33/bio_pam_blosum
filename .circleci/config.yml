@@ -64,9 +64,9 @@ jobs:
           name: Run Chrome via Selenium Server
           command: xvfb-run java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar selenium-server-standalone-3.13.0.jar
           background: true
-      - run:
-          name: Start Headless ChromeDriver
-          command: chromedriver --url-base=/wd/hub
+      #- run:
+          #name: Start Headless ChromeDriver
+          #command: chromedriver --url-base=/wd/hub
       - run:
           name: Run Dash tests
           # This assumes pytest is installed via the install-package step above
