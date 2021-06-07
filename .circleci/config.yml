@@ -37,20 +37,20 @@ jobs:
           # pip-dependency-file: test-requirements.txt  # if you have a different name for your requirements file, maybe one that combines your runtime and test requirements.
       # install java, chrome, chrome driver
       # https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/
-      - run: apt-get update
-      - run: apt-get install -y unzip xvfb libxi6 libgconf-2-4
-      - run: apt-get install default-jdk
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4
+      - run: sudo apt-get install default-jdk
       # Google Chrome
-      - run: curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
-      - run: echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
-      - run: apt-get -y update
-      - run: apt-get -y install google-chrome-stable
+      - run: sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
+      - run: sudo echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+      - run: sudo apt-get -y update
+      - run: sudo apt-get -y install google-chrome-stable
       # install Chrome Driver
       - run: wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
       - run: unzip chromedriver_linux64.zip
-      - run: mv chromedriver /usr/bin/chromedriver
-      - run: chown root:root /usr/bin/chromedriver
-      - run: chmod +x /usr/bin/chromedriver
+      - run: sudo mv chromedriver /usr/bin/chromedriver
+      - run: sudo chown root:root /usr/bin/chromedriver
+      - run: sudo chmod +x /usr/bin/chromedriver
       # download required Jar Files
       # https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/
       - run:
