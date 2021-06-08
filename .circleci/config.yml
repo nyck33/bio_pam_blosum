@@ -6,7 +6,7 @@ orbs:
   # so you dont have to copy and paste it everywhere.
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@1.2
-  heroku: circleci/heroku@x.y
+  heroku: circleci/heroku@1.2.6
 
 workflows:
   heroku_deploy:  # This is the name of the workflow, feel free to change it to better match your workflow.
