@@ -62,7 +62,9 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
-      - run:
-          name: Run Dash tests
+            pytest
+
+      #- run:
+       #   name: Run Dash tests
           # This assumes pytest is installed via the install-package step above
-          command: pytest
+        #  command: pytest
