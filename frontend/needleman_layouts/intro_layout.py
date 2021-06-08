@@ -30,7 +30,7 @@ needleman_intro = dbc.Container([
                 html.P(
                     "This is a work-in-progress to show my knowledge of Python, web programming, CI/CD, containerization,"
                     " and test automation as well as basic bioinformatics."
-                    " My project repo can be accessed at:"
+                    " My project repo (with to-do list) can be accessed at:"
                 ),
                 html.A(
                     "Link to bio_pam_blosum",
@@ -47,7 +47,7 @@ needleman_intro = dbc.Container([
             dbc.Col([
                 html.P(
                     "By Nobutaka Kim using Plotly Dash"
-                    " and BioPython"
+                    " and BioPython.  Testing with Selenium Web Driver, CI/CD with CircleCI and Docker."
                 ),
                 html.P(
                     "email: nobutaka@gatech.edu"
