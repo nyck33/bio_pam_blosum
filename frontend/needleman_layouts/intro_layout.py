@@ -39,6 +39,11 @@ needleman_intro = dbc.Container([
                     target="_blank"
                 ),
                 html.Br(),
+                html.H1(
+                    "Biopython methods are being debugged right now, please wait and refer here for updates:"
+                    "https://stackoverflow.com/q/67901364/9481613"
+                ),
+                html.Br(),
                 html.P(
                     "Instructions:\n "
                     "1. Search two sequences to align from the Entrez Page.\n"
