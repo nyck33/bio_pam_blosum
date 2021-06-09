@@ -94,6 +94,7 @@ entrez_page = dbc.Container([
             dcc.Input(
                 id="accession-input",
                 type="text",
+                value="NP_001239370.1",
                 size="50"
             ),
             dbc.Button(
@@ -107,6 +108,7 @@ entrez_page = dbc.Container([
             dcc.Input(
                 id="accession-input-two",
                 type="text",
+                value="NP_715630.3",
                 size="50"
             ),
             dbc.Button(
@@ -388,7 +390,10 @@ entrez_page = dbc.Container([
             )
         ], width=12),
         dbc.Col([
-
+            # todo: moved from app page to here
+            dcc.Store(
+                id="aligned-A"
+            ),
             dcc.Loading(
                 id='needleman-loading',
                 children=[
@@ -401,6 +406,9 @@ entrez_page = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
+            dcc.Store(
+                id="aligned-B"
+            ),
             dcc.Loading(
                 id='waterman-loading',
                 children=[
@@ -413,6 +421,12 @@ entrez_page = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
+            dcc.Store(
+                id="aligned-fasta-store"
+            ),
+            Download(
+                id="download-aligned-fasta"
+            ),
             dbc.Button(
                 "Make aligned Fasta for chart",
                 id='btn-align-fasta',
@@ -421,19 +435,23 @@ entrez_page = dbc.Container([
             ),
             html.Br(),
             html.Br(),
-            html.Div([
-                dbc.Button(
-                    "Download Aligned Fasta",
-                    id="download-btn",
-                    color="secondary",
-                    n_clicks=0
-                ),
-                Download(
-                    id="download-aligned-fasta"
-                )
-            ])
+            dbc.Button(
+                "Download Aligned Fasta",
+                id="download-btn",
+                color="secondary",
+                n_clicks=0
+            )
         ], width=12),
-
+        dbc.Col([
+            dcc.Loading(
+            id='aligned-fasta-loading',
+            children=[
+                html.Div(
+                    id="aligned-fasta-output"
+                )],
+                type="cube"
+            )
+        ],width=12),
         dbc.Col([
             html.P("Needle Water context check"),
             html.Div(

@@ -380,6 +380,7 @@ def register_entrez_callbacks(app):
             needle.align_local()
             alignments = needle.alignments
 
+            # todo: make this selectable or based on score
             # get the sequences from the first alignment and store
             # for chart
             aligned_seq1 = alignments[0].seqA
@@ -456,8 +457,8 @@ def register_entrez_callbacks(app):
 
     @app.callback(
         #[Output("aligned-fasta-store", 'data'),
-         #Output("aligned-fasta-output", 'children'),
-         [Output("aligned-fasta-store",'data'),
+         [Output("aligned-fasta-output", 'children'),
+         Output("aligned-fasta-store",'data'),
         Output('descrip-A-store', 'data'),
          Output('descrip-B-store', 'data')],
         [Input('btn-align-fasta', 'n_clicks')],
@@ -469,7 +470,7 @@ def register_entrez_callbacks(app):
     def make_aligned_fasta(n_clicks, align1_json, align2_json,
                            acc1_json, acc2_json):
         if n_clicks <=0:
-            return no_update, no_update, no_update
+            return no_update, no_update, no_update, no_update
         acc1 = json.loads(acc1_json)
         acc2 = json.loads(acc2_json)
         print(f'acc: {acc1}, {acc2}')
@@ -526,8 +527,32 @@ def register_entrez_callbacks(app):
         # return (content=fasta_str, filename=rel_path)
         #jsonify
         aligned_fasta_json = json.dumps(fasta_str)
+        # get output in form of html.Div
+        alignment_html = format_final_output(fasta_str)
         #return aligned_fasta_json, fasta_str, fasta1_desc_json, \
-        return aligned_fasta_json, fasta1_desc_json, fasta2_desc_json
+        return alignment_html, aligned_fasta_json,\
+               fasta1_desc_json, fasta2_desc_json
+
+    def format_final_output(aligned_fasta_str):
+        """
+        :param alignments:
+        :return: alignments_html
+        """
+        aligned_fasta_arr = aligned_fasta_str.splitlines()
+        alignments_html = \
+            html.Div([
+                html.H3(f"Aligned Fasta"),
+                html.Div([
+                    html.P(
+                        aligned_fasta_arr[i],
+                        style={
+                            'word-wrap': 'break-word'
+                        }
+                    ) for i in range(len(aligned_fasta_arr))
+                ])
+            ])
+        return alignments_html
+
 
     @app.callback(
         Output("download-aligned-fasta", "data"),

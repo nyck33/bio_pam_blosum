@@ -56,8 +56,8 @@ file_path = ""
 #register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 # for production, suppress callback exceptions
-app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
-#app = Dash(__name__, external_stylesheets=external_stylesheets)
+#app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 app.title = "Needleman Wunsch and NCBI"
@@ -130,20 +130,8 @@ content = dbc.Container([
             dcc.Store(
                 id="descrip-B-store"
             ),
-            dcc.Store(
-                id="aligned-A"
-            ),
-            dcc.Store(
-                id="aligned-B"
-            ),
-            dcc.Store(
-                id="aligned-fasta-store"
-            ),
-            html.Div(
-                id="aligned-fasta-output",
-                style={'display': 'none'}
-            ),
-
+            #todo: move stores for aligned to entrez layout where output is for needle and waterman
+            # see page bottom for snipped out snippet
             html.Div(
                 id='aligned-A-output',
                 style={'display': 'none'}
@@ -204,6 +192,30 @@ def render_page_content(pathname):
 
 if __name__=="__main__":
     # local testing
-    #app.run_server(debug=True) #port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
+    app.run_server(debug=True) #port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
     # production
-    app.run_server()
+    #app.run_server()
+
+"""
+            dcc.Store(
+                id="aligned-A"
+            ),
+            dcc.Store(
+                id="aligned-B"
+            ),
+            dcc.Loading(
+                id='aligned-fasta-loading',
+                children=[
+                    dcc.Store(
+                        id="aligned-fasta-store"
+                    )],
+                type="dot"
+            ),
+            #dcc.Store(
+            #    id="aligned-fasta-store"
+            #),
+            html.Div(
+                id="aligned-fasta-output",
+                style={'display': 'none'}
+            ),
+"""
