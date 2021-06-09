@@ -41,11 +41,13 @@ needleman_intro = dbc.Container([
                 html.Br(),
                 html.H1(
                     "Biopython methods are being debugged right now, please wait and refer here for updates:"
-                    "https://stackoverflow.com/q/67901364/9481613"
+                    "https://stackoverflow.com/q/67901364/9481613",
+                    style={'display': 'none'}
                 ),
                 html.Br(),
                 html.P(
                     "Instructions:\n "
+                    "Please enter your email at the top input before making any API calls to NCBI."
                     "1. Search two sequences to align from the Entrez Page.\n"
                     "2. Run global or local alignment which are stored automatically.\n"
                     "3. Press button to make the aligned fasta file.\n"
