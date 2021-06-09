@@ -469,7 +469,7 @@ def register_entrez_callbacks(app):
     def make_aligned_fasta(n_clicks, align1_json, align2_json,
                            acc1_json, acc2_json):
         if n_clicks <=0:
-            return no_update, no_update
+            return no_update, no_update, no_update
         acc1 = json.loads(acc1_json)
         acc2 = json.loads(acc2_json)
         print(f'acc: {acc1}, {acc2}')
@@ -537,5 +537,8 @@ def register_entrez_callbacks(app):
     def download_aligned_fasta(n_clicks, aligned_json):
         if n_clicks <= 0:
             return no_update
+        elif aligned_json is None:
+            return no_update
+
         fasta_str = json.loads(aligned_json)
         return dict(content=fasta_str, filename="aligned.fasta")
