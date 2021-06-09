@@ -56,8 +56,8 @@ file_path = ""
 #register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 # for production, suppress callback exceptions
-app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
-#app = Dash(__name__, external_stylesheets=external_stylesheets)
+#app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 app.title = "Needleman Wunsch and NCBI"
