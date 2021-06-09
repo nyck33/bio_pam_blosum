@@ -457,9 +457,9 @@ def register_entrez_callbacks(app):
 
     @app.callback(
         #[Output("aligned-fasta-store", 'data'),
-         [Output("aligned-fasta-output", 'children'),
-         Output("aligned-fasta-store",'data'),
-        Output('descrip-A-store', 'data'),
+         #[Output("aligned-fasta-output", 'children'),
+        [Output("aligned-fasta-store",'data'),
+         Output('descrip-A-store', 'data'),
          Output('descrip-B-store', 'data')],
         [Input('btn-align-fasta', 'n_clicks')],
         [State("aligned-A", 'data'),
@@ -470,7 +470,7 @@ def register_entrez_callbacks(app):
     def make_aligned_fasta(n_clicks, align1_json, align2_json,
                            acc1_json, acc2_json):
         if n_clicks <=0:
-            return no_update, no_update, no_update, no_update
+            return no_update, no_update, no_update
         acc1 = json.loads(acc1_json)
         acc2 = json.loads(acc2_json)
         print(f'acc: {acc1}, {acc2}')
@@ -527,11 +527,20 @@ def register_entrez_callbacks(app):
         # return (content=fasta_str, filename=rel_path)
         #jsonify
         aligned_fasta_json = json.dumps(fasta_str)
-        # get output in form of html.Div
-        alignment_html = format_final_output(fasta_str)
+
         #return aligned_fasta_json, fasta_str, fasta1_desc_json, \
-        return alignment_html, aligned_fasta_json,\
+        return aligned_fasta_json,\
                fasta1_desc_json, fasta2_desc_json
+
+    @app.callback(
+        Output("aligned-fasta-output", "children"),
+        [Input("aligned-fasta-store", "data")]
+    )
+    def output_aligned_fasta(aligned_fasta_json):
+        aligned_fasta_str = json.loads(aligned_fasta_json)
+        # get output in form of html.Div
+        alignment_fasta_div = format_final_output(aligned_fasta_str)
+        return alignment_fasta_div
 
     def format_final_output(aligned_fasta_str):
         """
@@ -552,7 +561,6 @@ def register_entrez_callbacks(app):
                 ])
             ])
         return alignments_html
-
 
     @app.callback(
         Output("download-aligned-fasta", "data"),
