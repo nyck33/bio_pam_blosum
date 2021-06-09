@@ -457,7 +457,8 @@ def register_entrez_callbacks(app):
     @app.callback(
         #[Output("aligned-fasta-store", 'data'),
          #Output("aligned-fasta-output", 'children'),
-         [Output('descrip-A-store', 'data'),
+         [Output("aligned-fasta-store",'data'),
+        Output('descrip-A-store', 'data'),
          Output('descrip-B-store', 'data')],
         [Input('btn-align-fasta', 'n_clicks')],
         [State("aligned-A", 'data'),
@@ -507,20 +508,34 @@ def register_entrez_callbacks(app):
         # try writing to file
         #todo: problem here with absolute path,
         # get __file__ path for this file, go to pardir then change dir
+        '''
         #full_path = "/home/nobu/Desktop/BioInformatics/bio_pam_blosum/frontend/needleman_layouts/data"
         script_dir = os.path.dirname(__file__)
         #https://stackoverflow.com/a/2860321/9481613
         par_dir = os.path.dirname(script_dir)
         data_dir = 'needleman_layouts/data'
         data_dir = os.path.join(par_dir, data_dir)
-        rel_path = "temp.fasta"
+        #todo: name this file first line of fasta with date
+        #rel_path = "aligned.fasta"
+        
         #abs_file_path = os.path.join(full_path, rel_path)
         abs_file_path = os.path.join(data_dir, rel_path)
         with open(abs_file_path, "w") as outfile:
             outfile.write(fasta_str)
-
+        '''
+        # return (content=fasta_str, filename=rel_path)
         #jsonify
         aligned_fasta_json = json.dumps(fasta_str)
         #return aligned_fasta_json, fasta_str, fasta1_desc_json, \
-        return fasta1_desc_json,\
-                fasta2_desc_json
+        return aligned_fasta_json, fasta1_desc_json, fasta2_desc_json
+
+    @app.callback(
+        Output("download-aligned-fasta", "data"),
+        [Input("download-btn", "n_clicks")],
+        [State("aligned-fasta-store",'data')]
+    )
+    def download_aligned_fasta(n_clicks, aligned_json):
+        if n_clicks <= 0:
+            return no_update
+        fasta_str = json.loads(aligned_json)
+        return dict(content=fasta_str, filename="aligned.fasta")

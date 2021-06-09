@@ -55,7 +55,7 @@ file_path = ""
 
 #register stylesheet
 external_stylesheets = [dbc.themes.BOOTSTRAP]
-app = Dash(__name__,external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+app = Dash(__name__,external_stylesheets=external_stylesheets) #suppress_callback_exceptions=True)
 server = app.server
 app.title = "Needleman Wunsch and NCBI"
 #app.config['suppress_callback_exceptions'] = True
@@ -200,5 +200,5 @@ def render_page_content(pathname):
 #####################################################################################
 
 if __name__=="__main__":
-    app.run_server()#debug=True) #port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
+    app.run_server(debug=True) #port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
     #app.run_server

@@ -32,10 +32,22 @@ needleman_intro = dbc.Container([
                     " and test automation as well as basic bioinformatics."
                     " My project repo (with to-do list) can be accessed at:"
                 ),
+                html.Br(),
                 html.A(
                     "Link to bio_pam_blosum",
                     href="https://github.com/nyck33/bio_pam_blosum",
                     target="_blank"
+                ),
+                html.Br(),
+                html.P(
+                    "Instructions:\n "
+                    "1. Search two sequences to align from the Entrez Page.\n"
+                    "2. Run global or local alignment which are stored automatically.\n"
+                    "3. Press button to make the aligned fasta file.\n"
+                    "4. Press button to download aligned.fasta.\n"
+                    "5. Navigate to the Alignment Chart page and upload aligned.fasta.\n"
+                    "6. Use scrolling and zooming tools to examine the alignment.\n"
+                    "Note: Blastp download capability is incomplete. "
                 )
 
             ]),

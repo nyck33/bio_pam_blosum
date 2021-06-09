@@ -19,6 +19,7 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
 from dash_table import DataTable
+from dash_extensions import Download
 
 #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 external_stylesheets = [dbc.themes.BOOTSTRAP]
@@ -415,9 +416,22 @@ entrez_page = dbc.Container([
             dbc.Button(
                 "Make aligned Fasta for chart",
                 id='btn-align-fasta',
-                color="danger",
+                color="primary",
                 n_clicks=0
-            )
+            ),
+            html.Br(),
+            html.Br(),
+            html.Div([
+                dbc.Button(
+                    "Download Aligned Fasta",
+                    id="download-btn",
+                    color="secondary",
+                    n_clicks=0
+                ),
+                Download(
+                    id="download-aligned-fasta"
+                )
+            ])
         ], width=12),
 
         dbc.Col([
