@@ -64,7 +64,8 @@ class Needleman():
 
         alignments = pairwise2.align.globalds(seq1, seq2, self.matrix,
                                               self.gap_open, self.gap_extend,
-                                              penalize_end_gaps=False)
+                                              penalize_end_gaps=False,
+                                              one_alignment_only=True)
 
         self.alignments = alignments
 
@@ -73,7 +74,8 @@ class Needleman():
         seq2 = self.seq2
         # alignments is a list of alignments
         alignments = pairwise2.align.localds(seq1, seq2, self.matrix,
-                                              self.gap_open, self.gap_extend)
+                                              self.gap_open, self.gap_extend,
+                                             one_alignment_only=True)
 
         self.alignments = alignments
 
@@ -88,7 +90,8 @@ def global_align_biop(seq1, seq2, matrix):
     #seq1, seq2, matrix = args_tup
     alignments = pairwise2.align.globalds(seq1, seq2, matrix,
                                           gap_open, gap_extend,
-                                          penalize_end_gaps=False)
+                                          penalize_end_gaps=False,
+                                          one_alignment_only=True)
     return alignments
 
 def local_align_biop(seq1, seq2, matrix):
@@ -96,7 +99,8 @@ def local_align_biop(seq1, seq2, matrix):
     gap_extend = -0.5
     #, seq2, matrix = args_tup
     alignments = pairwise2.align.localds(seq1, seq2, matrix,
-                                         gap_open, gap_extend)
+                                         gap_open, gap_extend,
+                                         one_alignment_only=True)
     return alignments
 
 

@@ -364,16 +364,16 @@ def register_entrez_callbacks(app):
         seq2 = json.loads(seq2_json)
 
         # instantiate class
-        #needle = Needleman(seq1, seq2, mat_name, gap_open, gap_extend)
-        #needle.load_matrix()
+        needle = Needleman(seq1, seq2, mat_name, gap_open, gap_extend)
+        needle.load_matrix()
         #todo: call functions outside of class for heroku
         matrix = matrix_load(mat_name)
         align_str_arr = []
         if trigger=='run-needleman':
-            #needle.align_global()
+            needle.align_global()
             # get list of named tuples
-            #alignments = needle.alignments
-            #args_tup = (seq1, seq2, matrix)
+            alignments = needle.alignments
+            '''
             job = q.enqueue(global_align_biop,
                             args=(seq1, seq2, matrix),
                             kwargs={'job_timeout':'5m'})
@@ -386,7 +386,7 @@ def register_entrez_callbacks(app):
                 #print(f'job.get_id(): {job.get_id()}, '
                  #     f'job.result:{job.result}')
             alignments = job.result
-            #     f'values[0]: {list(alignments.values())[0]}')
+            '''
             # get the sequences from the first alignment and store
             # for chart
             aligned_seq1 = alignments[0].seqA
@@ -400,9 +400,9 @@ def register_entrez_callbacks(app):
             return aligned1_json, aligned2_json, alignments_html, no_update,  ctx_msg
 
         if trigger=="run-waterman":
-            #needle.align_local()
-            #alignments = needle.alignments
-            #args_tup = (seq1, seq2, matrix)
+            needle.align_local()
+            alignments = needle.alignments
+            '''
             job = q.enqueue(local_align_biop,
                                    args=(seq1, seq2, matrix))
             count = 0
@@ -414,7 +414,7 @@ def register_entrez_callbacks(app):
                 #print(f'job.get_id(): {job.get_id()}, '
                  #     f'job.result:{job.result}')
             alignments = job.result
-
+            '''
             # todo: make this selectable or based on score
             # get the sequences from the first alignment and store
             # for chart

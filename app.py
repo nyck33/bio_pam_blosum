@@ -192,11 +192,12 @@ def render_page_content(pathname):
 
 if __name__=="__main__":
     # local testing
-    #app.run_server(debug=True) #port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
+    app.run_server(debug=True) #port=8080) #, dev_tools_ui=False, dev_tools_props_check=False)
     # production
-    app.run_server()
+    #app.run_server()
 
-"""
+"""            #args_tup = (seq1, seq2, matrix)
+
             dcc.Store(
                 id="aligned-A"
             ),
