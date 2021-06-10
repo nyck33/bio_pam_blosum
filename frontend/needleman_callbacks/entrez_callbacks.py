@@ -23,14 +23,21 @@ from Bio import pairwise2
 from Bio.Align import substitution_matrices
 # todo: download temp aligned fasta file to client
 from dash_extensions import Download
-
+import time
 #import ncbi search class
 from frontend.ncbi.ncbi_search import (
                                 set_global_email_ncbi_search,
                                 get_last_updated, get_fasta_by_accession,
                                 get_full_GB_info, searchByTerm)
 #import needleman
-from backend.bio_needleman import Needleman
+from backend.bio_needleman import (Needleman, global_align_biop,
+                                   local_align_biop, matrix_load)
+
+# todo: worker for Heroku
+from rq import Queue
+from worker import conn
+
+q = Queue(connection=conn)
 
 def register_entrez_callbacks(app):
     #debug json stores
@@ -357,13 +364,29 @@ def register_entrez_callbacks(app):
         seq2 = json.loads(seq2_json)
 
         # instantiate class
-        needle = Needleman(seq1, seq2, mat_name, gap_open, gap_extend)
-        needle.load_matrix()
+        #needle = Needleman(seq1, seq2, mat_name, gap_open, gap_extend)
+        #needle.load_matrix()
+        #todo: call functions outside of class for heroku
+        matrix = matrix_load(mat_name)
         align_str_arr = []
         if trigger=='run-needleman':
-            needle.align_global()
+            #needle.align_global()
             # get list of named tuples
-            alignments = needle.alignments
+            #alignments = needle.alignments
+            #args_tup = (seq1, seq2, matrix)
+            job = q.enqueue(global_align_biop,
+                            args=(seq1, seq2, matrix),
+                            kwargs={'job_timeout':'5m'})
+            count = 0
+            while True:
+                if job.result != None or count > 1000:
+                    break
+                time.sleep(1)
+                count+=1
+                #print(f'job.get_id(): {job.get_id()}, '
+                 #     f'job.result:{job.result}')
+            alignments = job.result
+            #     f'values[0]: {list(alignments.values())[0]}')
             # get the sequences from the first alignment and store
             # for chart
             aligned_seq1 = alignments[0].seqA
@@ -377,8 +400,20 @@ def register_entrez_callbacks(app):
             return aligned1_json, aligned2_json, alignments_html, no_update,  ctx_msg
 
         if trigger=="run-waterman":
-            needle.align_local()
-            alignments = needle.alignments
+            #needle.align_local()
+            #alignments = needle.alignments
+            #args_tup = (seq1, seq2, matrix)
+            job = q.enqueue(local_align_biop,
+                                   args=(seq1, seq2, matrix))
+            count = 0
+            while True:
+                if job.result != None or count > 1000:
+                    break
+                time.sleep(1)
+                count += 1
+                #print(f'job.get_id(): {job.get_id()}, '
+                 #     f'job.result:{job.result}')
+            alignments = job.result
 
             # todo: make this selectable or based on score
             # get the sequences from the first alignment and store

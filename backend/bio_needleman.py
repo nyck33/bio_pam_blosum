@@ -40,8 +40,7 @@ from Bio.Align import substitution_matrices
 import os
 
 class Needleman():
-    def __init__(self, seq1, seq2, matrix_name="BLOSUM62", gap_open=-10,
-                    gap_extend=-0.5):  #rel_path='sub_matrix/'):
+    def __init__(self, seq1, seq2, matrix_name="BLOSUM62", gap_open=-10, gap_extend=-0.5):  #rel_path='sub_matrix/'):
         self.matrix_name = matrix_name
         self.matrix = None
         self.seq1 = seq1
@@ -77,6 +76,29 @@ class Needleman():
                                               self.gap_open, self.gap_extend)
 
         self.alignments = alignments
+
+#todo: Heroku requires workers so take functions out of class
+def matrix_load(mat_name="BLOSUM62"):
+    mat = substitution_matrices.load(mat_name)
+    return mat
+
+def global_align_biop(seq1, seq2, matrix):
+    gap_open = -10
+    gap_extend = -0.5
+    #seq1, seq2, matrix = args_tup
+    alignments = pairwise2.align.globalds(seq1, seq2, matrix,
+                                          gap_open, gap_extend,
+                                          penalize_end_gaps=False)
+    return alignments
+
+def local_align_biop(seq1, seq2, matrix):
+    gap_open = -10
+    gap_extend = -0.5
+    #, seq2, matrix = args_tup
+    alignments = pairwise2.align.localds(seq1, seq2, matrix,
+                                         gap_open, gap_extend)
+    return alignments
+
 
 homosapiens_lactate = ("MATLKDQLIVNLLKEEQAPQNKITVVGVGAVGMACAISILMKDLADELALVDVMEDKLKGEMMDLQHGSL"
 +"FLKTPKIVSSKDYCVTANSKLVIITAGARQQEGESRLNLVQRNVNIFKFIIPNIVKYSPHCKLLIVSNPV"

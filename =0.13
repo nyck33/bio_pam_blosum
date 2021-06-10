@@ -1,0 +1,3 @@
+Requirement already satisfied: rq in /home/nobu/anaconda3/envs/bioapp/lib/python3.8/site-packages (1.8.1)
+Requirement already satisfied: click>=5.0.0 in /home/nobu/anaconda3/envs/bioapp/lib/python3.8/site-packages (from rq) (7.1.2)
+Requirement already satisfied: redis>=3.5.0 in /home/nobu/anaconda3/envs/bioapp/lib/python3.8/site-packages (from rq) (3.5.3)
