@@ -4,7 +4,8 @@ from rq import Queue, Retry
 #from worker import conn
 from worker2 import conn2
 import time
-from biop_pairwise_aligner import (global_align2, x, y)
+from biop_pairwise_aligner import (global_align2, x, y,
+                                   local_align)
 
 
 def tester():
@@ -13,7 +14,7 @@ def tester():
     matrix = substitution_matrices.load(mat_name)
     #aligner = Align.PairwiseAligner()
     # aligner.substitution_matrix = matrix
-    job = q.enqueue(global_align2, args=(x, y, matrix))
+    job = q.enqueue(local_align, args=(x, y, matrix))
     # alignments = global_align()
     count = 0
 
@@ -33,7 +34,7 @@ def tester():
     seqA_adj = make_single_seq(seqA, connector)
     seqB_adj = make_single_seq(seqB, connector)
 
-    assert len(seqA_adj) == len(seqB_adj) == len(connector)
+    #assert len(seqA_adj) == len(seqB_adj) == len(connector)
 
     print(f'strA:\n{str(seqA)}\n'
           f'strB:\n{str(seqB)}')

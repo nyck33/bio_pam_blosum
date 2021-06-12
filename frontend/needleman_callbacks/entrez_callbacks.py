@@ -30,15 +30,14 @@ from frontend.ncbi.ncbi_search import (
                                 get_last_updated, get_fasta_by_accession,
                                 get_full_GB_info, searchByTerm)
 #import needleman
-from backend.bio_needleman import (Needleman,
-                                   local_align_biop, matrix_load)
+from backend.bio_needleman import (Needleman, matrix_load)
 
 # todo: worker for Heroku
 #from Bio import pairwise2
 
 from rq import Queue, Retry
 from worker import conn
-from .aligner_utils import (global_align2)#, get_protein_alignment, make_single_seq)
+from .aligner_utils import (local_align, global_align2)#, get_protein_alignment, make_single_seq)
 
 def register_entrez_callbacks(app):
     #debug json stores
@@ -421,51 +420,43 @@ def register_entrez_callbacks(app):
             #needle.align_local()
             #alignments = needle.alignments
 
-            job = q.enqueue(local_align_biop,
-                            args=(seq1, seq2, matrix),
-                            retry=Retry(max=5))
+            job = q.enqueue(local_align, args=(seq1, seq2, matrix))
+
             count = 0
             while True:
-                if job.result != None or count > 1000:
+                if job.result is not None or count > 9999:
                     break
                 time.sleep(1)
                 count += 1
-                print(f'job.get_id(): {job.get_id()}, '
-                      f'job.result:{job.result}')
-            alignments = job.result
+                #print(f'job.get_id(): {job.get_id()}, '
+                 #     f'job.result:{job.result}')
 
-            # todo: make this selectable or based on score
+
+            alignment = job.result
+            # want to separate string into each protein and connecting lines
+            seqA, connector, seqB = get_protein_alignment(alignment)
+            #aligned_seq1 = make_single_seq(seq1, connector)
+            #aligned_seq2 = make_single_seq(seq2, connector)
+
             # get the sequences from the first alignment and store
             # for chart
-            aligned_seq1 = alignments[0].seqA
-            aligned_seq2 = alignments[0].seqB
-            # jsonify
-            aligned1_json = json.dumps(aligned_seq1)
-            aligned2_json = json.dumps(aligned_seq2)
+            #aligned_seq1 = alignment[0].seqA
+            #aligned_seq2 = alignment[0].seqB
+            #jsonify
+            seqA_str = str(seqA)
+            seqB_str = str(seqB)
+            aligned1_json = json.dumps(str(seqA_str))
+            aligned2_json = json.dumps(str(seqB_str))
 
-            alignments_html = format_output(alignments, "Smith-Waterman")
+            #alignment_html = format_output(alignment, "Needleman-Wunsch")
+
+            alignments_html = format_for_aligner(alignment, "Smith-Waterman")
+
+            #alignments_html = format_output(alignments, "Smith-Waterman")
             return aligned1_json, aligned2_json, no_update, alignments_html, ctx_msg
 
 
-    def align_global(seq1, seq2, matrix, gap_open=-10, gap_extend=-0.5):
-        aligner = Align.PairwiseAligner()
-        # Align.PairwiseAligner.__module__ = "__init__"
-        # set params
-        aligner.match_score = 1.0
-        aligner.open_gap_score = gap_open
-        aligner.extend_gap_score = gap_extend
-        aligner.mode = 'global'
-        # assert aligner.algorithm == 'Needleman-Wunsch', f'{aligner.algorithm}'
-        aligner.substitution_matrix = matrix
-        alignments = aligner.align(seq1, seq2)
-        # all alignments have same score
-        score = alignments.score
-        # return 10
-        # alignments_arr = []
-        # for a in alignments:
-        #   alignments_arr.append(a)
-        # print(score, alignments[0])
-        return alignments[0]
+
 
     def get_protein_alignment(alignment):
         """
@@ -598,11 +589,11 @@ def register_entrez_callbacks(app):
             return no_update, no_update, no_update
         acc1 = json.loads(acc1_json)
         acc2 = json.loads(acc2_json)
-        print(f'acc: {acc1}, {acc2}')
+        #print(f'acc: {acc1}, {acc2}')
         # load aligned string sequences
         seqA = json.loads(align1_json)
         seqB = json.loads(align2_json)
-        print(f'seqs from json:\n{seqA}\n{seqB}')
+        #print(f'seqs from json:\n{seqA}\n{seqB}')
 
         fasta1_desc = get_fasta_by_accession(acc1, full_fasta=True)
         fasta2_desc = get_fasta_by_accession(acc2, full_fasta=True)

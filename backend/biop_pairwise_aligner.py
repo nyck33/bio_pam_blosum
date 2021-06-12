@@ -1,8 +1,8 @@
 from Bio import Align
 from Bio.Align import substitution_matrices
 from rq import Queue, Retry
-from worker import conn
-#from worker2 import conn2
+#from worker import conn
+from worker2 import conn2
 import time
 
 
@@ -69,7 +69,7 @@ def global_align2(seq1, seq2, matrix, gap_open=-10, gap_extend=-0.5):
     #print(score, alignments[0])
     return alignments[0]
 
-def local_align(aligner, seq1, seq2, matrix, gap_open=-10, gap_extend=-0.5):
+def local_align(seq1, seq2, matrix, gap_open=-10, gap_extend=-0.5):
     """
 
     :param aligner: aligner obj
@@ -78,18 +78,20 @@ def local_align(aligner, seq1, seq2, matrix, gap_open=-10, gap_extend=-0.5):
     :param matrix:
     :return: alignments an iterator of alignment objects
     """
+    aligner = Align.PairwiseAligner()
+
     # set params
     aligner.match_score = 1.0
     aligner.open_gap_score = gap_open
     aligner.extend_gap_score = gap_extend
     aligner.mode = 'local'
-    assert aligner.algorithm == 'Smith-Waterman', f'{aligner.algorithm}'
+    #assert aligner.algorithm == 'Smith-Waterman', f'{aligner.algorithm}'
     aligner.substitution_matrix = matrix
     alignments = aligner.align(seq1, seq2)
     # all alignments have same score
     score = alignments.score
 
-    return alignments
+    return alignments[0]
 
 def get_protein_alignment(alignment):
     """
