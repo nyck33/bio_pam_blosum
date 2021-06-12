@@ -144,5 +144,7 @@ def main():
 def tester():
     main()
 
+'''
 if __name__ == "__main__":
     tester()
+'''

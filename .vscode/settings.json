@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/home/nobu/anaconda3/envs/bio/bin/python",
+    "python.pythonPath": "/home/nobu/anaconda3/envs/bioapp/bin/python",
     "jupyter.jupyterServerType": "local"
 }

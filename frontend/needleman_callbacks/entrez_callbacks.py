@@ -19,7 +19,7 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State # Load Data
 from Bio import SeqIO
-from Bio import pairwise2
+from Bio import pairwise2, Align
 from Bio.Align import substitution_matrices
 # todo: download temp aligned fasta file to client
 from dash_extensions import Download
@@ -30,14 +30,15 @@ from frontend.ncbi.ncbi_search import (
                                 get_last_updated, get_fasta_by_accession,
                                 get_full_GB_info, searchByTerm)
 #import needleman
-from backend.bio_needleman import (Needleman, global_align_biop,
+from backend.bio_needleman import (Needleman,
                                    local_align_biop, matrix_load)
 
 # todo: worker for Heroku
-from rq import Queue
-from worker import conn
+#from Bio import pairwise2
 
-q = Queue(connection=conn)
+from rq import Queue, Retry
+from worker import conn
+from .aligner_utils import (global_align2)#, get_protein_alignment, make_single_seq)
 
 def register_entrez_callbacks(app):
     #debug json stores
@@ -364,57 +365,75 @@ def register_entrez_callbacks(app):
         seq2 = json.loads(seq2_json)
 
         # instantiate class
-        needle = Needleman(seq1, seq2, mat_name, gap_open, gap_extend)
-        needle.load_matrix()
+        #needle = Needleman(seq1, seq2, mat_name, gap_open, gap_extend)
+        #needle.load_matrix()
         #todo: call functions outside of class for heroku
+        # make queue for RQ
+        q = Queue(connection=conn)
+
         matrix = matrix_load(mat_name)
         align_str_arr = []
+        gap_open = -10
+        gap_extend = -0.5
+        #aligner_obj = pairwise2.align()
         if trigger=='run-needleman':
-            needle.align_global()
+            #needle.align_global()
             # get list of named tuples
-            alignments = needle.alignments
+            #alignments = needle.alignments
+            #alignments = global_align_biop(seq1, seq2, matrix)
             '''
-            job = q.enqueue(global_align_biop,
-                            args=(seq1, seq2, matrix),
-                            kwargs={'job_timeout':'5m'})
+            pairwise2.align.globalds(seq1, seq2, matrix,
+                                     gap_open, gap_extend,
+                                     penalize_end_gaps=False,
+                                     one_alignment_only=True)
+            '''
+            job = q.enqueue(global_align2, args=(seq1, seq2, matrix))
+
             count = 0
             while True:
-                if job.result != None or count > 1000:
+                if job.result is not None or count > 9999:
                     break
                 time.sleep(1)
                 count+=1
-                #print(f'job.get_id(): {job.get_id()}, '
-                 #     f'job.result:{job.result}')
-            alignments = job.result
-            '''
+
+            alignment = job.result
+            # want to separate string into each protein and connecting lines
+            seqA, connector, seqB = get_protein_alignment(alignment)
+            #aligned_seq1 = make_single_seq(seq1, connector)
+            #aligned_seq2 = make_single_seq(seq2, connector)
+
             # get the sequences from the first alignment and store
             # for chart
-            aligned_seq1 = alignments[0].seqA
-            aligned_seq2 = alignments[0].seqB
+            #aligned_seq1 = alignment[0].seqA
+            #aligned_seq2 = alignment[0].seqB
             #jsonify
-            aligned1_json = json.dumps(aligned_seq1)
-            aligned2_json = json.dumps(aligned_seq2)
+            seqA_str = str(seqA)
+            seqB_str = str(seqB)
+            aligned1_json = json.dumps(str(seqA_str))
+            aligned2_json = json.dumps(str(seqB_str))
 
-            alignments_html = format_output(alignments, "Needleman-Wunsch")
+            #alignment_html = format_output(alignment, "Needleman-Wunsch")
 
+            alignments_html = format_for_aligner(alignment, "Needleman-Wunsch")
             return aligned1_json, aligned2_json, alignments_html, no_update,  ctx_msg
 
         if trigger=="run-waterman":
-            needle.align_local()
-            alignments = needle.alignments
-            '''
+            #needle.align_local()
+            #alignments = needle.alignments
+
             job = q.enqueue(local_align_biop,
-                                   args=(seq1, seq2, matrix))
+                            args=(seq1, seq2, matrix),
+                            retry=Retry(max=5))
             count = 0
             while True:
                 if job.result != None or count > 1000:
                     break
                 time.sleep(1)
                 count += 1
-                #print(f'job.get_id(): {job.get_id()}, '
-                 #     f'job.result:{job.result}')
+                print(f'job.get_id(): {job.get_id()}, '
+                      f'job.result:{job.result}')
             alignments = job.result
-            '''
+
             # todo: make this selectable or based on score
             # get the sequences from the first alignment and store
             # for chart
@@ -426,6 +445,77 @@ def register_entrez_callbacks(app):
 
             alignments_html = format_output(alignments, "Smith-Waterman")
             return aligned1_json, aligned2_json, no_update, alignments_html, ctx_msg
+
+
+    def align_global(seq1, seq2, matrix, gap_open=-10, gap_extend=-0.5):
+        aligner = Align.PairwiseAligner()
+        # Align.PairwiseAligner.__module__ = "__init__"
+        # set params
+        aligner.match_score = 1.0
+        aligner.open_gap_score = gap_open
+        aligner.extend_gap_score = gap_extend
+        aligner.mode = 'global'
+        # assert aligner.algorithm == 'Needleman-Wunsch', f'{aligner.algorithm}'
+        aligner.substitution_matrix = matrix
+        alignments = aligner.align(seq1, seq2)
+        # all alignments have same score
+        score = alignments.score
+        # return 10
+        # alignments_arr = []
+        # for a in alignments:
+        #   alignments_arr.append(a)
+        # print(score, alignments[0])
+        return alignments[0]
+
+    def get_protein_alignment(alignment):
+        """
+
+        :param alignments: iterator of alignment objects
+        :param idx: choose alignments[idx]
+        :return: seqA and seqB alignments to make aligned FASTA
+        """
+        target = str(alignment)
+        seq_arr = target.split()
+        seqA, connectors, seqB = seq_arr
+
+        return seqA, connectors, seqB
+
+    #def format_for_aligner(seqA, connector, seqB, algo_name):
+    def format_for_aligner(alignment, algo_name):
+        """
+        make an html div
+        :param alignments:
+        :param algo_name:
+        :return:
+        """
+        # find max count
+
+        alignments_html = \
+            html.Div([
+                html.H3(f"{algo_name} Alignments"),
+                html.Div([
+                    html.P(
+                        str(alignment),
+                        style={
+                            'word-wrap': 'break-word'
+                        }
+                    )
+                ])
+            ])
+
+        return alignments_html
+
+        '''
+        max_count = len(connector) // 50
+        alignments_html = \
+            html.Div([
+                html.P(
+                    seqA[count*50: (count*50)+50]
+                    connector[count*50: (count*50)+50]
+                    seqB[count * 50: (count*50) + 50]
+                ) for count in range(0, max_count+1)
+            ])
+        '''
 
     def format_output(alignments, algo_name):
         """
