@@ -50,7 +50,6 @@ class Needleman():
         self.alignments = []
         #self.rel_path = rel_path
 
-
     def load_matrix(self):
         name_string = self.matrix_name
         matrix=substitution_matrices.load(name_string)
@@ -84,6 +83,18 @@ def matrix_load(mat_name="BLOSUM62"):
     mat = substitution_matrices.load(mat_name)
     return mat
 
+def top_level_global(pairwise_align_ojb, seq1, seq2, matrix):
+    gap_open = -10
+    gap_extend = -0.5
+    alignments = pairwise_align_ojb.globalds(seq1, seq2, matrix,
+                                             gap_open, gap_extend,
+                                             penalize_end_gaps=False,
+                                             one_alignment_only=True)
+    return alignments
+
+
+
+
 def global_align_biop(seq1, seq2, matrix):
     gap_open = -10
     gap_extend = -0.5
@@ -92,6 +103,7 @@ def global_align_biop(seq1, seq2, matrix):
                                           gap_open, gap_extend,
                                           penalize_end_gaps=False,
                                           one_alignment_only=True)
+    print(len(alignments))
     return alignments
 
 def local_align_biop(seq1, seq2, matrix):
