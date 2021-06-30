@@ -48,15 +48,15 @@ needleman_intro = dbc.Container([
                 html.P(
                     "Instructions:\n "
                     "Please enter your email at the top input before making any API calls to NCBI."
-                    "1. Search two sequences to align from the Entrez Page.\n"
-                    "2. Run global or local alignment which are stored automatically.\n"
-                    "3. Press button to make the aligned fasta file.\n"
-                    "4. Press button to download aligned.fasta.\n"
-                    "5. Navigate to the Alignment Chart page and upload aligned.fasta.\n"
-                    "6. Use scrolling and zooming tools to examine the alignment.\n"
-                    "Note: Blastp download capability is incomplete. "
-                )
-
+                ),
+                #html.Br(),
+                html.Li("1. Search two sequences to align from the Entrez Page."),
+                html.Li("2. Run global or local alignment which are stored automatically."),
+                html.Li("3. Press button to make the aligned fasta file."),
+                html.Li("4. Press button to download aligned.fasta."),
+                html.Li("5. Navigate to the Alignment Chart page and upload aligned.fasta."),
+                html.Li("6. Use scrolling and zooming tools to examine the alignment."),
+                html.Li("Note: Blastp download capability is incomplete. ")
             ]),
         ], width=12),
         html.Br(),
