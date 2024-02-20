@@ -1,0 +1,19 @@
+e-Basis plant food -> list of compounds -> search on Knapsack Biomarker -> 
+
+lutein
+e-basis plant food -> dietNavi knapsack -> results page with health effect
+
+or 
+
+ebasis plant food -> KEGG -> KEGG orthology
+
+
+
+
+Health effects of food:
+
+knapsack LunchBox -> バナナー＞ musa sapientum -> "more" -> summary of health care
+
+またはDietNaviからバナナを検索、効能に表示される
+
+ebasis-> common name, get scientific name for search on Knapsack Lunchbox

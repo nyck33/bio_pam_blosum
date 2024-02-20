@@ -1,0 +1,19 @@
+Job Hunt intensively.
+
+Get a job, then study area related to job and get good at job.
+
+Be ready for Fall.  
+
+Take part time job by mid-May if things don't look good.
+
+Pretty up my Bioinformatics app and deploy with Docker and Circle CI.
+
+bioapp
+
+Entrez layout put email box
+-store
+-add input to entrez callbacks
+
+Store whatever it is that I save going to Alignment Chart
+
+

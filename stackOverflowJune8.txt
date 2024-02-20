@@ -1,0 +1,11 @@
+I am testing under the exact same conditions locally and 
+My global and local alignment app: https://bio-pam-blosum.herokuapp.com/entrez-parameters
+
+is incomplete but works locally following instructions on the intro page (please enter a valid email address) for the same version I git pushed which then gets tested on CircleCI with very simple Selenium tests (only checking for text of H2 and H3 elements as I am new to Selenium and don't know how to write tests for this problem yet) that pass both locally and on the platform before being pushed to Heroku.  
+
+It is built with Plotly Dash so I make sure I run `app.run_server()` without `debug=True` and turn off callback exceptions when pushing to what I am calling production although it is incomplete.  I test under same conditions locally and get the output I need so I can then make an aligned fasta file (between 2 protein sequences) and download the file to upload to the Alignment Chart on the other page in the app.
+
+Does anybody have any idea why the two global and local alignment methods executed when "Run Needleman-Wunsch" and "Run Smith Waterman" buttons near the bottom are pressed are not showing any output nor seem to be executing at all when deployed?  
+
+My repo: https://github.com/nyck33/bio_pam_blosum
+
